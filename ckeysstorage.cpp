@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 
@@ -18,7 +19,7 @@ bool cKeysStorage::generate(std::string pFileName)
     BIGNUM          *bne = NULL;
     BIO             *bp_public = NULL, *bp_private = NULL;
 
-    int             bits = 1024;
+    int             bits = 4096;
     unsigned long   e = RSA_F4;
 
     // 1. generate rsa key
@@ -51,7 +52,10 @@ bool cKeysStorage::generate(std::string pFileName)
 bool cKeysStorage::sign(std::string pFileName, unsigned int pNumberOfKey)
 {
     std::ifstream mInputFile;
-    RSA *rsa = createRSAWithFilename(std::string("0_prv.pem").c_str(), true);   //TODO
+    std::stringstream ss;
+    ss << pNumberOfKey;
+    ss << "_prv.pem";
+    RSA *rsa = createRSAWithFilename(ss.str().c_str(), true);
     if (rsa == NULL)
         return false;
 
@@ -77,8 +81,16 @@ bool cKeysStorage::sign(std::string pFileName, unsigned int pNumberOfKey)
     RSA_free(rsa);
     std::ofstream mOutFile;
     std::string mOutName(pFileName);
-    mOutName += "_sign";
-    mOutFile.open(mOutName, std::ios::out | std::ios::trunc | std::ios::binary);
+    mOutName += ".pub";
+    mOutFile.open(mOutName);
+    //save header
+    mOutFile << "version 1" << std::endl;
+    mOutFile << "crypto rsa" << std::endl;
+    mOutFile << "size 4096" << std::endl;
+    mOutFile << "END" << std::endl;
+    mOutFile.close();
+    //save data
+    mOutFile.open(mOutName, std::ios::out | std::ios::app | std::ios::binary);
     mOutFile.write(std::static_pointer_cast<char>(mOutBuffer).get(), mLength);
     mOutFile.close();
     return true;
