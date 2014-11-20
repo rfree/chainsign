@@ -7,8 +7,12 @@ using namespace std;
 int main()
 {
     cKeysStorage keyStorage = cKeysStorage();
-    for (int i = 0; i < 100; ++i)
-        keyStorage.generate(std::to_string(i));
+    //for (int i = 0; i < 1; ++i)
+       // keyStorage.generate(std::to_string(i));
+
+	//keyStorage.sign("test.txt", 0);
+	
+	keyStorage.GenerateRSAKey(4096, "test.prv", "test.pub");
 
     return 0;
 }

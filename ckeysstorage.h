@@ -12,6 +12,9 @@ public:
     bool generate(std::string pFileName);    // generate pub and prv key
     bool sign(std::string pFileName, unsigned int pNumberOfKey);
     bool verify(std::string pFileName, unsigned int pNumberOfKey);
+    //cryptopp
+    void Sign();
+    void GenerateRSAKey(unsigned int keyLength, const char *privFilename, const char *pubFilename);
 private:
     RSA* createRSAWithFilename(const char * filename, bool pub);
 };
