@@ -186,25 +186,8 @@ RSA* cKeysStorage::createRSAWithFilename(const char * filename, bool pub)
 
 void cKeysStorage::GenerateRSAKey(unsigned int keyLength, const char *pubFilename)
 {
-	using namespace CryptoPP;
-	/*char seed[1024];
-	for (int i = 0; i < 1024; i++)
-		seed[i] = rand() % 256; // TODO better random generator
-	RandomPool randPool;	
-	randPool.IncorporateEntropy((byte *)seed, strlen(seed));
-	
-	RSAES_OAEP_SHA_Decryptor priv(randPool, keyLength);
-	//HexEncoder privFile(new FileSink(privFilename));
-	//priv.DEREncode(privFile);
-	//privFile.MessageEnd();
-
-	RSAES_OAEP_SHA_Encryptor pub(priv);
-	HexEncoder pubFile(new FileSink(pubFilename));
-	pub.DEREncode(pubFile);
-	pubFile.MessageEnd();*/
-	
+	using namespace CryptoPP;	
 	// Generate Parameters
-	AutoSeededRandomPool rng;
 	InvertibleRSAFunction params;
 	params.GenerateRandomWithKeySize(rng, keyLength);
 	
@@ -233,12 +216,38 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
     mOutFile.close();
 }
 
-void cKeysStorage::RSASignFile(const char *privFilename, const char *messageFilename, const char *signatureFilename)
+//https://gist.github.com/TimSC/5251670
+void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::string& signatureFilename, unsigned int numberOfKey)
 {
 	/*using namespace CryptoPP;
 	FileSource privFile(privFilename, true, new HexDecoder);
 	RSASS<PKCS1v15, SHA>::Signer priv(privFile);
 	FileSource f(messageFilename, true, new SignerFilter(GlobalRNG(), priv, new HexEncoder(new FileSink(signatureFilename))));*/
+	std::ifstream mInputFile(messageFilename, std::ios::binary | std::ios::in);
+	// get length of file:
+    mInputFile.seekg (0, mInputFile.end);
+    int mLength = mInputFile.tellg();
+    mInputFile.seekg (0, mInputFile.beg);
+    
+    std::shared_ptr<char> mBuffer (new char[mLength], [](char* p){delete p;});
+    mInputFile.read(mBuffer.get(), mLength);
+    mInputFile.close();
+    
+    CryptoPP::RSA::PrivateKey privateKey = mPrvKeys.at(numberOfKey);
+	
+	RSASSA_PKCS1v15_SHA_Signer privkey(privateKey);
+	SecByteBlock sbbSignature(privkey.SignatureLength());
+	privkey.SignMessage(
+		rng,
+		(byte const*) strContents.data(),
+		strContents.size(),
+		sbbSignature);
+ 
+	//Save result
+	/*FileSink sink("signed.dat");
+	sink.Put((byte const*) strContents.data(), strContents.size());
+	FileSink sinksig("sig.dat");
+	sinksig.Put(sbbSignature, sbbSignature.size());*/
 }
 
 
