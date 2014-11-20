@@ -206,13 +206,32 @@ void cKeysStorage::GenerateRSAKey(unsigned int keyLength, const char *pubFilenam
 	// Generate Parameters
 	AutoSeededRandomPool rng;
 	InvertibleRSAFunction params;
-	params.GenerateRandomWithKeySize(rng, 4096);
+	params.GenerateRandomWithKeySize(rng, keyLength);
 	
 	// Create Keys
 	CryptoPP::RSA::PrivateKey privateKey(params);
 	CryptoPP::RSA::PublicKey publicKey(params);
+	mPrvKeys.push_back(privateKey);
+	savePubFile(3, publicKey);
 }
 
+void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey)
+{
+	std::ofstream mOutFile;
+    std::string mOutName(std::to_string(numberOfKey));
+    mOutName += ".pub";
+    mOutFile.open(mOutName);
+    //save header
+    mOutFile << "version 1" << std::endl;
+    mOutFile << "crypto rsa" << std::endl;
+    mOutFile << "size 4096" << std::endl;
+    mOutFile << "END" << std::endl;
+    mOutFile.close();
+    //save data
+    mOutFile.open(mOutName, std::ios::out | std::ios::app | std::ios::binary);
+    mOutFile.write(reinterpret_cast<const char*>(&pPubKey), sizeof(pPubKey));
+    mOutFile.close();
+}
 
 void cKeysStorage::RSASignFile(const char *privFilename, const char *messageFilename, const char *signatureFilename)
 {

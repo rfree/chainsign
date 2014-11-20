@@ -23,6 +23,7 @@ private:
     
     //cryptopp
     std::vector <CryptoPP::RSA::PrivateKey> mPrvKeys;
+    void savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey);
     
 };
 
