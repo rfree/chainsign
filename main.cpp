@@ -11,8 +11,8 @@ int main()
        // keyStorage.generate(std::to_string(i));
 
 	//keyStorage.sign("test.txt", 0);
-	
-	keyStorage.GenerateRSAKey(4096, "test.prv", "test.pub");
+	std::srand(time(NULL));
+	keyStorage.GenerateRSAKey(4096, "test.pub");
 
     return 0;
 }

@@ -152,9 +152,9 @@ RSA* cKeysStorage::createRSAWithFilename(const char * filename, bool pub)
 
 
 
-void cKeysStorage::Sign()
+/*void cKeysStorage::Sign()
 {
-/*	using namespace CryptoPP;
+	using namespace CryptoPP;
    std::string strContents = "A message to be signed";
    //FileSource("tobesigned.dat", true, new StringSink(strContents));
    
@@ -181,29 +181,46 @@ void cKeysStorage::Sign()
    FileSink sink("signed.dat");
    sink.Put((byte const*) strContents.data(), strContents.size());
    FileSink sinksig("sig.dat");
-   sinksig.Put(sbbSignature, sbbSignature.size());*/
-}
+   sinksig.Put(sbbSignature, sbbSignature.size());
+}*/
 
-void cKeysStorage::GenerateRSAKey(unsigned int keyLength, const char *privFilename, const char *pubFilename)
+void cKeysStorage::GenerateRSAKey(unsigned int keyLength, const char *pubFilename)
 {
 	using namespace CryptoPP;
-	char seed[1024];
+	/*char seed[1024];
 	for (int i = 0; i < 1024; i++)
 		seed[i] = rand() % 256; // TODO better random generator
 	RandomPool randPool;	
 	randPool.IncorporateEntropy((byte *)seed, strlen(seed));
 	
 	RSAES_OAEP_SHA_Decryptor priv(randPool, keyLength);
-	HexEncoder privFile(new FileSink(privFilename));
-	priv.DEREncode(privFile);
-	privFile.MessageEnd();
+	//HexEncoder privFile(new FileSink(privFilename));
+	//priv.DEREncode(privFile);
+	//privFile.MessageEnd();
 
 	RSAES_OAEP_SHA_Encryptor pub(priv);
 	HexEncoder pubFile(new FileSink(pubFilename));
 	pub.DEREncode(pubFile);
-	pubFile.MessageEnd();
+	pubFile.MessageEnd();*/
+	
+	// Generate Parameters
+	AutoSeededRandomPool rng;
+	InvertibleRSAFunction params;
+	params.GenerateRandomWithKeySize(rng, 4096);
+	
+	// Create Keys
+	CryptoPP::RSA::PrivateKey privateKey(params);
+	CryptoPP::RSA::PublicKey publicKey(params);
 }
 
+
+void cKeysStorage::RSASignFile(const char *privFilename, const char *messageFilename, const char *signatureFilename)
+{
+	/*using namespace CryptoPP;
+	FileSource privFile(privFilename, true, new HexDecoder);
+	RSASS<PKCS1v15, SHA>::Signer priv(privFile);
+	FileSource f(messageFilename, true, new SignerFilter(GlobalRNG(), priv, new HexEncoder(new FileSink(signatureFilename))));*/
+}
 
 
 /*
