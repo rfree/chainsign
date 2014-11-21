@@ -6,6 +6,7 @@ using namespace std;
 
 int main()
 {
+	//remove("tmp");
     cKeysStorage keyStorage = cKeysStorage();
     //for (int i = 0; i < 1; ++i)
        // keyStorage.generate(std::to_string(i));

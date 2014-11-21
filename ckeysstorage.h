@@ -18,7 +18,7 @@ public:
 private:
     
     //cryptopp
-    std::vector <CryptoPP::RSA::PrivateKey> mPrvKeys;
+    std::vector <CryptoPP::RSA::PrivateKey> mPrvKeys;	// TODO map
     //CryptoPP::RSA::PublicKey mCurrentPublicKey;
     void savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey);
     CryptoPP::RSA::PublicKey loadPubFile(unsigned int numberOfKey);
