@@ -119,14 +119,19 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load sig file
 {
 	std::string line;
 	std::string clearTextFileName;
+	int pubicKeyNumber;
 	// read public key
 	std::ifstream input(fileName);
-	for (int i = 0; i < 5; ++i)	// 4 lines
+	input >> line;
+	//input >> line;
+	input >> pubicKeyNumber;
+	std::cout << line << " " << pubicKeyNumber << std::endl;
+	for (int i = 0; i < 4; ++i)	// 3 lines
 	{
 		input >> line;
 		std::cout << line;
 		input >> line;
-		std::cout << line << std::endl;;
+		std::cout << line << std::endl;
 	}
 	
 	clearTextFileName = line;
@@ -142,6 +147,9 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load sig file
 	std::cout << std::endl << "signature" << std::endl;
 	for (auto a : signature)
 		std::cout << a;
+		
+	std::cout << std::endl << "start verify" << std::endl;
+	loadPubFile(pubicKeyNumber);
 }
 
 void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey)
@@ -160,6 +168,34 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
     mOutFile.open(mOutName, std::ios::out | std::ios::app | std::ios::binary);
     mOutFile.write(reinterpret_cast<const char*>(&pPubKey), sizeof(pPubKey));
     mOutFile.close();
+}
+
+void cKeysStorage::loadPubFile(unsigned int numberOfKey)
+{
+	std::string fileName(std::to_string(numberOfKey));
+	fileName += ".pub";
+	std::cout << "Public key file: " << fileName << std::endl;
+	std::string line;
+	std::ifstream input(fileName);
+	for (int i = 0; i < 3; i++)
+	{
+		input >> line;
+		std::cout << line << " ";
+		input >> line;
+		std::cout << line << std::endl;
+	}
+	input >> line; // END
+	
+	// load rsa data
+	char byte;
+	std::vector<char> binaryKey;
+	while (!input.eof())
+	{
+		input.read(&byte, 1);
+		binaryKey.push_back(byte);
+	}
+	
+	mCurrentPublicKey = *reinterpret_cast<CryptoPP::RSA::PublicKey*>(binaryKey.data());
 }
 
 //https://gist.github.com/TimSC/5251670
@@ -203,6 +239,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	//output.close();
 	//output.open(signatureFilename, std::ios::out | std::ios::app | std::ios::binary);
 	output.write(reinterpret_cast<const char*>(&sbbSignature), sbbSignature.size());
+	output.close();
 }
 
 

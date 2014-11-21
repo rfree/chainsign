@@ -25,7 +25,9 @@ private:
     
     //cryptopp
     std::vector <CryptoPP::RSA::PrivateKey> mPrvKeys;
+    CryptoPP::RSA::PublicKey mCurrentPublicKey;
     void savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey);
+    void loadPubFile(unsigned int numberOfKey);
 	
 	//CryptoPP::AutoSeededRandomPool rng;
     
