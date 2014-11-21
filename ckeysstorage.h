@@ -3,8 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <openssl/rsa.h>
-#include <openssl/pem.h>
 
 #include <crypto++/rsa.h>
 #include <crypto++/osrng.h>
@@ -13,15 +11,11 @@ class cKeysStorage
 {
 public:
     cKeysStorage();
-    bool generate(std::string pFileName);    // generate pub and prv key
-    bool sign(std::string pFileName, unsigned int pNumberOfKey);
-    bool verify(std::string pFileName, unsigned int pNumberOfKey);
     //cryptopp
     void RSASignFile(const std::string& messageFilename, const std::string& signatureFilename, unsigned int numberOfKey);
     void RSAVerifyFile(const std::string& fileName);
     void GenerateRSAKey(unsigned int keyLength);
 private:
-    RSA* createRSAWithFilename(const char * filename, bool pub);
     
     //cryptopp
     std::vector <CryptoPP::RSA::PrivateKey> mPrvKeys;
