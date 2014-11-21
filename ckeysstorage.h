@@ -7,6 +7,7 @@
 #include <openssl/pem.h>
 
 #include <crypto++/rsa.h>
+#include <crypto++/osrng.h>
 
 class cKeysStorage
 {
@@ -25,7 +26,7 @@ private:
     std::vector <CryptoPP::RSA::PrivateKey> mPrvKeys;
     void savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey);
 	
-	AutoSeededRandomPool rng;
+	//CryptoPP::AutoSeededRandomPool rng;
     
 };
 

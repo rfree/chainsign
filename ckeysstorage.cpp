@@ -187,6 +187,7 @@ RSA* cKeysStorage::createRSAWithFilename(const char * filename, bool pub)
 void cKeysStorage::GenerateRSAKey(unsigned int keyLength, const char *pubFilename)
 {
 	using namespace CryptoPP;	
+	AutoSeededRandomPool rng;
 	// Generate Parameters
 	InvertibleRSAFunction params;
 	params.GenerateRandomWithKeySize(rng, keyLength);
@@ -219,10 +220,9 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
 //https://gist.github.com/TimSC/5251670
 void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::string& signatureFilename, unsigned int numberOfKey)
 {
-	/*using namespace CryptoPP;
-	FileSource privFile(privFilename, true, new HexDecoder);
-	RSASS<PKCS1v15, SHA>::Signer priv(privFile);
-	FileSource f(messageFilename, true, new SignerFilter(GlobalRNG(), priv, new HexEncoder(new FileSink(signatureFilename))));*/
+	using namespace CryptoPP;
+
+	AutoSeededRandomPool rng;
 	std::ifstream mInputFile(messageFilename, std::ios::binary | std::ios::in);
 	// get length of file:
     mInputFile.seekg (0, mInputFile.end);
@@ -239,15 +239,25 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	SecByteBlock sbbSignature(privkey.SignatureLength());
 	privkey.SignMessage(
 		rng,
-		(byte const*) strContents.data(),
-		strContents.size(),
+		(byte const*) mBuffer.get(),
+		mLength,
 		sbbSignature);
  
 	//Save result
-	/*FileSink sink("signed.dat");
-	sink.Put((byte const*) strContents.data(), strContents.size());
-	FileSink sinksig("sig.dat");
-	sinksig.Put(sbbSignature, sbbSignature.size());*/
+	//FileSink sink(signatureFilename.c_str());
+	//sink.Put((byte const*) mBuffer.get(), mLength);
+	//FileSink sinksig(signatureFilename.c_str());
+	//sinksig.Put(sbbSignature, sbbSignature.size());
+	std::ofstream output(signatureFilename);
+	output << "id-nr " << numberOfKey << std::endl;
+	output << "key-ver 1" << std::endl;
+	output << "key-crypto rsa" << std::endl;
+	output << "key-size 4096" << std::endl;
+	output << messageFilename << std::endl;
+	output << "END" << std::endl;
+	output.close();
+	output.open(signatureFilename, std::ios::out | std::ios::app | std::ios::binary);
+	output.write(reinterpret_cast<const char*>(&sbbSignature), sbbSignature.size());
 }
 
 
