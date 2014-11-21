@@ -18,7 +18,8 @@ public:
     bool verify(std::string pFileName, unsigned int pNumberOfKey);
     //cryptopp
     void RSASignFile(const std::string& messageFilename, const std::string& signatureFilename, unsigned int numberOfKey);
-    void GenerateRSAKey(unsigned int keyLength, const char *pubFilename);
+    void RSAVerifyFile(const std::string& fileName);
+    void GenerateRSAKey(unsigned int keyLength);
 private:
     RSA* createRSAWithFilename(const char * filename, bool pub);
     
