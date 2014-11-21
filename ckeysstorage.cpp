@@ -102,7 +102,7 @@ RSA* cKeysStorage::createRSAWithFilename(const char * filename, bool pub)
 
 void cKeysStorage::GenerateRSAKey(unsigned int keyLength)
 {
-	using namespace CryptoPP;	
+	using namespace CryptoPP;
 	AutoSeededRandomPool rng;
 	// Generate Parameters
 	InvertibleRSAFunction params;
@@ -117,6 +117,7 @@ void cKeysStorage::GenerateRSAKey(unsigned int keyLength)
 
 void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load sig file
 {
+	using namespace CryptoPP;
 	std::string line;
 	std::string clearTextFileName;
 	int pubicKeyNumber;
@@ -137,7 +138,7 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load sig file
 	clearTextFileName = line;
 	// load rsa data
 	char byte;
-	std::vector<char> signature;
+	std::vector<unsigned char> signature;
 	while (!input.eof())
 	{
 		input.read(&byte, 1);
@@ -148,8 +149,19 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load sig file
 	for (auto a : signature)
 		std::cout << a;
 		
+	CryptoPP::RSA::PublicKey currentPubKey = loadPubFile(pubicKeyNumber);
 	std::cout << std::endl << "start verify" << std::endl;
-	loadPubFile(pubicKeyNumber);
+	RSASSA_PKCS1v15_SHA_Verifier verifier(currentPubKey);
+	try
+	{
+		StringSource(signature.data(), signature.size(), true, 
+			new SignatureVerificationFilter(verifier, NULL, SignatureVerificationFilter::THROW_EXCEPTION) );
+		std::cout << "Signature OK" << std::endl;
+	}
+	catch(SignatureVerificationFilter::SignatureVerificationFailed &err)
+	{
+		std::cout << err.what() << std::endl;
+	} 
 }
 
 void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey)
@@ -168,9 +180,11 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
     mOutFile.open(mOutName, std::ios::out | std::ios::app | std::ios::binary);
     mOutFile.write(reinterpret_cast<const char*>(&pPubKey), sizeof(pPubKey));
     mOutFile.close();
+    
+    std::cout << "size of pub key: " << sizeof(pPubKey) << std::endl;
 }
 
-void cKeysStorage::loadPubFile(unsigned int numberOfKey)
+CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(unsigned int numberOfKey)
 {
 	std::string fileName(std::to_string(numberOfKey));
 	fileName += ".pub";
@@ -195,7 +209,17 @@ void cKeysStorage::loadPubFile(unsigned int numberOfKey)
 		binaryKey.push_back(byte);
 	}
 	
-	mCurrentPublicKey = *reinterpret_cast<CryptoPP::RSA::PublicKey*>(binaryKey.data());
+	binaryKey.erase(binaryKey.begin()); // remove /n
+	binaryKey.pop_back(); // remove eof
+	
+	std::cout << "Loaded key from file" << std::endl;
+	for (auto a : binaryKey)
+		std::cout << a;
+	
+	
+	std::cout << std::endl << "size of pub key from file: " << binaryKey.size() << std::endl;
+	
+	return *reinterpret_cast<CryptoPP::RSA::PublicKey*>(binaryKey.data());
 }
 
 //https://gist.github.com/TimSC/5251670
