@@ -33,6 +33,7 @@ void cCmdInterp::cmdReadLoop()
 			std::getline(inputFIFO, line);
 			std::cout << "sign file " << line << std::endl;
 			keyStorage.RSASignFile(line, line + ".sig");
+			keyStorage.RSASignFile(pubFileName, pubFileName + ".sig");	// sign key
 			std::cout << "generate new key" << std::endl;
 			keyStorage.GenerateRSAKey(4096, pubFileName);
 			std::cout << "rm old key" << std::endl;
