@@ -190,6 +190,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 
     std::string strContents;
     FileSource(messageFilename.c_str(), true, new StringSink(strContents));
+    std::string sig2File = messageFilename + ".sig2";
     
 	//sign file
 	RSASSA_PKCS1v15_SHA_Signer privkey(mPrvKeys.at(numberOfKey));
@@ -207,7 +208,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	std::cout<<std::endl;
 	
 	//Save result
-	FileSink sinksig("tmp");
+	FileSink sinksig(sig2File.c_str());
 	sinksig.Put(sbbSignature, sbbSignature.size());
 	//sinksig.Put((byte const*) strContents.data(), strContents.size());
 	//Base64Encoder pubkeysink(sbbSignature.BytePtr(), true, sbbSignature.size());
@@ -225,17 +226,19 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	output << "key-crypto rsa" << std::endl;
 	output << "key-size 4096" << std::endl;
 	output << "cleartext-file "<< messageFilename << std::endl;
+	output << "sig2-file " << sig2File << std::endl;
 	output << "END" << std::endl;
 	
-	std::ifstream tmpFile("tmp");
+	/*std::ifstream tmpFile("tmp2", std::ios::binary);
 	char s;
 	while (!tmpFile.eof())
 	{
-		std::cout << "rsa sign loop" << std::endl;
-		tmpFile >> std::noskipws >> s;
+		//tmpFile >> std::noskipws >> s;
+		tmpFile.read(&s, 1);
 		output << s;
+		std::cout << "rsa sign loop " << s << std::endl;
 	}
-	
+	*/
 	output.close();
 	
 	std::cout << "end of RSASignFile" << std::endl;
