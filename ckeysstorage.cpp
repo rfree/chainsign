@@ -209,8 +209,9 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	//Save result
 	FileSink sinksig("tmp");
 	sinksig.Put(sbbSignature, sbbSignature.size());
+	//sinksig.Put((byte const*) strContents.data(), strContents.size());
 	//Base64Encoder pubkeysink(sbbSignature.BytePtr(), true, sbbSignature.size());
-	//sinksig.MessageSeriesEnd();
+	sinksig.MessageSeriesEnd();
 	//std::cout.write(reinterpret_cast<char*>(sbbSignature.BytePtr()), sbbSignature.size());
 	//std::cout << std::endl;
 	
