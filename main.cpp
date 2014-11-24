@@ -3,6 +3,7 @@
 #include <fstream>
 #include <thread>
 #include "ckeysstorage.h"
+#include "cCmdInterp.hpp"
 
 #define KEY_SIZE 4096
 
@@ -10,27 +11,9 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	/*FILE *fp;
-	fp = fopen("fifo", "r");
-	char c;
-	while((c=getc(fp)) != EOF)
-	{
-		std::cout << c << std::endl;
-	}
-	fclose(fp);*/
-	
-	std::ifstream inputFIFO; //("fifo");
-	std::string line;
-	while (1)
-	{
-		inputFIFO.open("fifo");
-		std::getline(inputFIFO, line);
-		std::cout << line << std::endl;
-		inputFIFO.close();
-		if (line == "QUIT")
-			break;
-			
-	}
+	cCmdInterp cmdInterp("fifo");
+	cmdInterp.cmdReadLoop();
+
 	
 	if (argv[1] == "--daemon")
 	{
