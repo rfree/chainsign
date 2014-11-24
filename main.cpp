@@ -12,14 +12,12 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 	std::cout << "start main" << std::endl;
-	cCmdInterp cmdInterp("fifo", "instance"); // TODO instance
-	std::cout << "start loop" << std::endl;
-	cmdInterp.cmdReadLoop();
-
 	
-	if (argv[1] == "--daemon")
+	if (std::string(argv[1]) == "--daemon")
 	{
-		
+		cCmdInterp cmdInterp("fifo", argv[2]);
+		std::cout << "start loop" << std::endl;
+		cmdInterp.cmdReadLoop();
 	}
 	//remove("tmp");
     std::cout << KEY_SIZE << std::endl;

@@ -5,7 +5,7 @@ cCmdInterp::cCmdInterp(std::string pFifoName, std::string pInstance)
 :inst(pInstance)
 {
 	inputFIFO.open(pFifoName);
-	inst = "inst20141120_1242"; // TODO
+	//inst = "inst20141120_1242"; // TODO
 }
 
 void cCmdInterp::cmdReadLoop()
@@ -37,7 +37,7 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "generate new key" << std::endl;
 			keyStorage.GenerateRSAKey(4096, pubFileName);
 			std::cout << "rm old key" << std::endl;
-			//keyStorage.RemoveRSAKey();
+			keyStorage.RemoveRSAKey();
 		}
 			
 	}

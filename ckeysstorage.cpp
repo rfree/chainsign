@@ -215,7 +215,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	sinksig.MessageSeriesEnd();
 	
 	std::ofstream output(signatureFilename);
-	output << "id-nr " << mCurrentKey << std::endl;
+	output << "id-nr " << mCurrentKey - 1 << std::endl;
 	output << "key-ver 1" << std::endl;
 	output << "key-crypto rsa" << std::endl;
 	output << "key-size 4096" << std::endl;
