@@ -111,9 +111,9 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
     mOutFile << "END" << std::endl;
     
     //generate pub key in txt file
-    /*Base64Encoder pubkeysink(new FileSink("tmp"));
+    Base64Encoder pubkeysink(new FileSink("tmp"));
 	pPubKey.DEREncode(pubkeysink);
-	pubkeysink.MessageEnd();*/
+	pubkeysink.MessageEnd();
 	
 	//append from tmp to pub file
 	std::ifstream tmpFile("tmp");
@@ -152,6 +152,7 @@ CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(unsigned int numberOfKey)
 		input >> line;
 		std::cout << line << std::endl;
 	}
+	std::cout << "Load rsa data" << std::endl;
 	input >> line; // END
 	
 	// load rsa data
@@ -159,6 +160,7 @@ CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(unsigned int numberOfKey)
 	
 	//from .pub to tmp
 	std::ofstream tmpFile("tmp", std::ios::trunc);
+	
 	while (!input.eof())
 	{
 		input >> std::noskipws >> byte;
@@ -185,38 +187,28 @@ CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(unsigned int numberOfKey)
 void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::string& signatureFilename, unsigned int numberOfKey)
 {
 	AutoSeededRandomPool rng;
-	std::ifstream mInputFile(messageFilename, std::ios::binary | std::ios::in);
-	// get length of file:
-    mInputFile.seekg (0, mInputFile.end);
-    int mLength = mInputFile.tellg();
-    mInputFile.seekg (0, mInputFile.beg);
-    std::cout << "input file size: " << mLength << std::endl;
+
+    std::string strContents;
+    FileSource(messageFilename.c_str(), true, new StringSink(strContents));
     
-    std::shared_ptr<char> mBuffer (new char[mLength], [](char* p){delete []p;});
-    mInputFile.read(mBuffer.get(), mLength);
-    mInputFile.close();
-    
-    //CryptoPP::RSA::PrivateKey privateKey = mPrvKeys.at(numberOfKey);
 	//sign file
 	RSASSA_PKCS1v15_SHA_Signer privkey(mPrvKeys.at(numberOfKey));
 	SecByteBlock sbbSignature(privkey.SignatureLength());
 	privkey.SignMessage(
 		rng,
-		(byte const*) mBuffer.get(),
-		mLength,
+		(byte const*) strContents.data(),
+		strContents.size(),
 		sbbSignature);
 	
 	std::cout << "Size of signature: " << sbbSignature.size() << std::endl;
-	
-	//Save result
-	FileSink sinksig("tmp");
 	
 	std::cout<<std::endl;
 	std::cout.write( reinterpret_cast<const char*> (sbbSignature.BytePtr()) , sbbSignature.size() ); // XXX FIXME remove the bad cast!!! test
 	std::cout<<std::endl;
 	
-	sinksig.Put(sbbSignature.BytePtr(), sbbSignature.size());
-	std::cout << "signature" << std::endl;
+	//Save result
+	FileSink sinksig("tmp");
+	sinksig.Put(sbbSignature, sbbSignature.size());
 	//Base64Encoder pubkeysink(sbbSignature.BytePtr(), true, sbbSignature.size());
 	//sinksig.MessageSeriesEnd();
 	//std::cout.write(reinterpret_cast<char*>(sbbSignature.BytePtr()), sbbSignature.size());
@@ -238,6 +230,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	char s;
 	while (!tmpFile.eof())
 	{
+		std::cout << "rsa sign loop" << std::endl;
 		tmpFile >> std::noskipws >> s;
 		output << s;
 	}
