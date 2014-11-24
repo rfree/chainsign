@@ -36,6 +36,7 @@ void cKeysStorage::GenerateRSAKey(unsigned int keyLength, std::string fileName)
 	
 	//mPrvKeys.push_back(privateKey);
 	mPrvKeys[mCurrentKey] = privateKey;
+	std::cout << "start saving pub file" << std::endl;
 	savePubFile(mCurrentKey, publicKey, fileName);
 	
 	mCurrentKey++;
@@ -188,9 +189,14 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
     FileSource(messageFilename.c_str(), true, new StringSink(strContents));
     std::string sig2File = messageFilename + ".sig2";
     
+    
 	//sign file
-	RSASSA_PKCS1v15_SHA_Signer privkey(mPrvKeys.at(mCurrentKey));
+	std::cout << std::endl << std::endl << "start sign file" << std::endl;
+	std::cout << "size of map " << mPrvKeys.size() << std::endl;
+	std::cout << "current key " << mCurrentKey << std::endl;
+	RSASSA_PKCS1v15_SHA_Signer privkey(mPrvKeys.at(mCurrentKey - 1));
 	SecByteBlock sbbSignature(privkey.SignatureLength());
+	std::cout << "sign message" << std::endl;
 	privkey.SignMessage(
 		rng,
 		(byte const*) strContents.data(),
@@ -226,7 +232,7 @@ void cKeysStorage::RemoveRSAKey()
 {
 	if (mCurrentKey == 1)
 		return;
-	mPrvKeys.erase(mCurrentKey - 1);
+	mPrvKeys.erase(mPrvKeys.begin());
 }
 
 /*

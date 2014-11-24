@@ -12,7 +12,7 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 	std::cout << "start main" << std::endl;
-	cCmdInterp cmdInterp("fifo", "instance"); // TODO 
+	cCmdInterp cmdInterp("fifo", "instance"); // TODO instance
 	std::cout << "start loop" << std::endl;
 	cmdInterp.cmdReadLoop();
 
