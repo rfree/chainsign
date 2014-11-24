@@ -11,7 +11,9 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	cCmdInterp cmdInterp("fifo");
+	std::cout << "start main" << std::endl;
+	cCmdInterp cmdInterp("fifo", "instance"); // TODO 
+	std::cout << "start loop" << std::endl;
 	cmdInterp.cmdReadLoop();
 
 	
@@ -21,14 +23,14 @@ int main(int argc, char* argv[])
 	}
 	//remove("tmp");
     std::cout << KEY_SIZE << std::endl;
-	cKeysStorage keyStorage = cKeysStorage();
+	//cKeysStorage keyStorage = cKeysStorage();
     //for (int i = 0; i < 1; ++i)
        // keyStorage.generate(std::to_string(i));
 
 	//keyStorage.sign("test.txt", 0);
 	//keyStorage.GenerateRSAKey(KEY_SIZE);
 	//keyStorage.RSASignFile("test.txt", "test.sig", 0);
-	keyStorage.RSAVerifyFile("test.sig");
+	//keyStorage.RSAVerifyFile("test.sig");
 
     return 0;
 }

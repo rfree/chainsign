@@ -17,11 +17,12 @@
 using namespace CryptoPP;
 
 cKeysStorage::cKeysStorage()
+: mCurrentKey(1)
 {
 }
 
 
-void cKeysStorage::GenerateRSAKey(unsigned int keyLength)
+void cKeysStorage::GenerateRSAKey(unsigned int keyLength, std::string fileName)
 {
 	using namespace CryptoPP;
 	AutoSeededRandomPool rng;
@@ -33,11 +34,13 @@ void cKeysStorage::GenerateRSAKey(unsigned int keyLength)
 	CryptoPP::RSA::PrivateKey privateKey(params);
 	CryptoPP::RSA::PublicKey publicKey(params);
 	
-	mPrvKeys.push_back(privateKey);
-	savePubFile(mPrvKeys.size() - 1, publicKey); // 0, 1, 2 ...
+	//mPrvKeys.push_back(privateKey);
+	mPrvKeys[mCurrentKey] = privateKey;
+	savePubFile(mCurrentKey, publicKey, fileName);
+	
+	mCurrentKey++;
 	
 	std::cout << "end of GenerateRSAKey" << std::endl;
-	std::cin.get();
 }
 
 void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
@@ -98,14 +101,14 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
 		std::cout << "verify error " << err.what() << std::endl;
 	}
 	std::cout << "end of RsaVerifyFile" << std::endl;
-	std::cin.get();
 }
 
-void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey)
+void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey, std::string fileName)
 {
 	std::ofstream mOutFile;
-    std::string mOutName(std::to_string(numberOfKey));
-    mOutName += ".pub";
+    std::string mOutName; //(std::to_string(numberOfKey));
+    //mOutName += ".pub";
+    mOutName = fileName;
     mOutFile.open(mOutName);
     //save header
     mOutFile << "version 1" << std::endl;
@@ -127,11 +130,9 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
 		mOutFile << s;
 	}
 	
-    mOutFile.close();
-    
+    mOutFile.close();   
     
     std::cout << "end of savePubFile" << std::endl;
-	std::cin.get();
 }
 
 CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(unsigned int numberOfKey)
@@ -175,12 +176,11 @@ CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(unsigned int numberOfKey)
 	
 	std::cout << "end of loadPubFile" << std::endl;
 	
-	std::cin.get();
 	return pubKey;
 }
 
 //https://gist.github.com/TimSC/5251670
-void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::string& signatureFilename, unsigned int numberOfKey)
+void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::string& signatureFilename)
 {
 	AutoSeededRandomPool rng;
 
@@ -189,7 +189,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
     std::string sig2File = messageFilename + ".sig2";
     
 	//sign file
-	RSASSA_PKCS1v15_SHA_Signer privkey(mPrvKeys.at(numberOfKey));
+	RSASSA_PKCS1v15_SHA_Signer privkey(mPrvKeys.at(mCurrentKey));
 	SecByteBlock sbbSignature(privkey.SignatureLength());
 	privkey.SignMessage(
 		rng,
@@ -199,9 +199,9 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	
 	std::cout << "Size of signature: " << sbbSignature.size() << std::endl;
 	
-	std::cout<<std::endl;
-	std::cout.write( reinterpret_cast<const char*> (sbbSignature.BytePtr()) , sbbSignature.size() ); // XXX FIXME remove the bad cast!!! test
-	std::cout<<std::endl;
+	//std::cout<<std::endl;
+	//std::cout.write( reinterpret_cast<const char*> (sbbSignature.BytePtr()) , sbbSignature.size() ); // XXX FIXME remove the bad cast!!! test
+	//std::cout<<std::endl;
 	
 	//Save result
 	FileSink sinksig(sig2File.c_str());
@@ -209,7 +209,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	sinksig.MessageSeriesEnd();
 	
 	std::ofstream output(signatureFilename);
-	output << "id-nr " << numberOfKey << std::endl;
+	output << "id-nr " << mCurrentKey << std::endl;
 	output << "key-ver 1" << std::endl;
 	output << "key-crypto rsa" << std::endl;
 	output << "key-size 4096" << std::endl;
@@ -220,9 +220,14 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	output.close();
 	
 	std::cout << "end of RSASignFile" << std::endl;
-	std::cin.get();
 }
 
+void cKeysStorage::RemoveRSAKey()
+{
+	if (mCurrentKey == 1)
+		return;
+	mPrvKeys.erase(mCurrentKey - 1);
+}
 
 /*
 .pub format:

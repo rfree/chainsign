@@ -8,11 +8,12 @@
 class cCmdInterp
 {
 public:
-	cCmdInterp(std::string pFifoName);
+	cCmdInterp(std::string pFifoName, std::string pInstance);
 	void cmdReadLoop();
 private:
 	std::ifstream inputFIFO;
 	cKeysStorage keyStorage;
+	std::string inst;
 };
 
 #endif

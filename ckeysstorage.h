@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include <crypto++/rsa.h>
 #include <crypto++/osrng.h>
@@ -12,19 +13,20 @@ class cKeysStorage
 public:
     cKeysStorage();
     //cryptopp
-    void RSASignFile(const std::string& messageFilename, const std::string& signatureFilename, unsigned int numberOfKey);
+    void RSASignFile(const std::string& messageFilename, const std::string& signatureFilename);
     void RSAVerifyFile(const std::string& fileName);
-    void GenerateRSAKey(unsigned int keyLength);
-private:
-    
+    void GenerateRSAKey(unsigned int keyLength, std::string fileName);
+    unsigned int getCurrentKey() { return mCurrentKey; }
+    void RemoveRSAKey();
+private:   
     //cryptopp
-    std::vector <CryptoPP::RSA::PrivateKey> mPrvKeys;	// TODO map
+    //std::vector <CryptoPP::RSA::PrivateKey> mPrvKeys;	// TODO map
+    std::map <int, CryptoPP::RSA::PrivateKey> mPrvKeys;
     //CryptoPP::RSA::PublicKey mCurrentPublicKey;
-    void savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey);
+    void savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey, std::string fileName);
     CryptoPP::RSA::PublicKey loadPubFile(unsigned int numberOfKey);
 	
-	//CryptoPP::AutoSeededRandomPool rng;
-    
+	unsigned int mCurrentKey;
 };
 
 #endif // CKEYSSTORAGE_H
