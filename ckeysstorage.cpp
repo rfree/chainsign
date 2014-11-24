@@ -44,7 +44,7 @@ void cKeysStorage::GenerateRSAKey(unsigned int keyLength, std::string fileName)
 	std::cout << "end of GenerateRSAKey" << std::endl;
 }
 
-void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
+bool cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
 {
 	using namespace CryptoPP;
 	std::string line;
@@ -79,7 +79,8 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
 	std::string signature;
 	FileSource(sig2file.c_str(), true, new StringSink(signature)); 
 	
-	std::cout << std::endl << "signature " << std::noskipws << signature << std::endl;
+	//std::cout << std::endl << "signature " << std::noskipws << signature << std::endl;
+	std::cout << std::endl << "pubicKeyNumber " << pubicKeyNumber << std::endl;
 		
 	CryptoPP::RSA::PublicKey currentPubKey = loadPubFile(pubicKeyNumber);
 	AutoSeededRandomPool rng;
@@ -96,10 +97,12 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
 		StringSource(combined, true, 
 			new SignatureVerificationFilter(verifier, NULL, SignatureVerificationFilter::THROW_EXCEPTION) );
 		std::cout << "Signature OK" << std::endl;
+		return true;
 	}
 	catch(SignatureVerificationFilter::SignatureVerificationFailed &err)
 	{
 		std::cout << "verify error " << err.what() << std::endl;
+		return false;
 	}
 	std::cout << "end of RsaVerifyFile" << std::endl;
 }
@@ -139,6 +142,7 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
 CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(unsigned int numberOfKey)
 {
 	std::string fileName(std::to_string(numberOfKey));
+	//fileName += ".pub";
 	fileName += ".pub";
 	std::cout << "Public key file: " << fileName << std::endl;
 	std::string line;

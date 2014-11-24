@@ -14,7 +14,7 @@ public:
     cKeysStorage();
     //cryptopp
     void RSASignFile(const std::string& messageFilename, const std::string& signatureFilename);
-    void RSAVerifyFile(const std::string& fileName);
+    bool RSAVerifyFile(const std::string& fileName);
     void GenerateRSAKey(unsigned int keyLength, std::string fileName);
     unsigned int getCurrentKey() { return mCurrentKey; }
     void RemoveRSAKey();

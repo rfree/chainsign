@@ -19,6 +19,13 @@ int main(int argc, char* argv[])
 		std::cout << "start loop" << std::endl;
 		cmdInterp.cmdReadLoop();
 	}
+	
+	else if (std::string(argv[1]) == "--verify-chain" )//&& std::string(argv[3]) == "--move")
+	{
+		cCmdInterp cmdInterp;
+		//cmdInterp.verify(std::string(argv[2]));
+		cmdInterp.verify(std::string(argv[2]));
+	}
 	//remove("tmp");
     std::cout << KEY_SIZE << std::endl;
 	//cKeysStorage keyStorage = cKeysStorage();
