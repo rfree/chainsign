@@ -62,21 +62,34 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
 	
 	clearTextFileName = line;
 	input >> line;
+	input >> line;
+	
+	std::string sig2file = line;
+	
+	std::cout << "clear file: " << clearTextFileName << std::endl;
+	std::cout << "sig2 file: " << sig2file << std::endl;
+	
 	// load rsa data
-	char byte;
-	std::string signature;
+	/*char byte;
+	
 	std::cout << "start load signature" << std::endl;
 	while (!input.eof())
 	{
 		input.read(&byte, 1);
 		signature.push_back(byte);
 		std::cout << "Read key: " << byte << std::endl;
-	}
+	}*/
 	
 	//signature.pop_back(); // rm 2 last chars
 	//signature.pop_back();
 	
-	std::cout << std::endl << "signature" << std::noskipws << signature << std::endl;
+	//load signature
+	std::string signedTxt;
+	FileSource(clearTextFileName.c_str(), true, new StringSink(signedTxt)); 
+	std::string signature;
+	FileSource(sig2file.c_str(), true, new StringSink(signature)); 
+	
+	std::cout << std::endl << "signature " << std::noskipws << signature << std::endl;
 		
 	CryptoPP::RSA::PublicKey currentPubKey = loadPubFile(pubicKeyNumber);
 	AutoSeededRandomPool rng;
@@ -84,16 +97,20 @@ void cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
 	std::cout << std::endl << "start verify" << std::endl;
 	RSASSA_PKCS1v15_SHA_Verifier verifier(currentPubKey);
 
-	/*try
+
+	std::string combined(signedTxt);
+	combined.append(signature); 
+
+	try
 	{
-		StringSource(signature.data(), signature.size(), true, 
-		new SignatureVerificationFilter(verifier, NULL, SignatureVerificationFilter::THROW_EXCEPTION) );
+		StringSource(combined, true, 
+			new SignatureVerificationFilter(verifier, NULL, SignatureVerificationFilter::THROW_EXCEPTION) );
 		std::cout << "Signature OK" << std::endl;
 	}
 	catch(SignatureVerificationFilter::SignatureVerificationFailed &err)
 	{
 		std::cout << "verify error " << err.what() << std::endl;
-	}*/
+	}
 	std::cout << "end of RsaVerifyFile" << std::endl;
 	std::cin.get();
 }

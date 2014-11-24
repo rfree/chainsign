@@ -15,8 +15,8 @@ int main()
        // keyStorage.generate(std::to_string(i));
 
 	//keyStorage.sign("test.txt", 0);
-	keyStorage.GenerateRSAKey(KEY_SIZE);
-	keyStorage.RSASignFile("test.txt", "test.sig", 0);
+	//keyStorage.GenerateRSAKey(KEY_SIZE);
+	//keyStorage.RSASignFile("test.txt", "test.sig", 0);
 	keyStorage.RSAVerifyFile("test.sig");
 
     return 0;
