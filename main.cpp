@@ -27,8 +27,8 @@ int main(int argc, char* argv[])
 	else if (std::string(argv[1]) == "--verify-chain" )
 	{
 		cCmdInterp cmdInterp;
-		cmdInterp.verify(std::string(argv[2]));
 		cmdInterp.setOutDir(std::string(argv[4]));
+		cmdInterp.verify(std::string(argv[2]));
 	}
 	
     std::cout << KEY_SIZE << std::endl;

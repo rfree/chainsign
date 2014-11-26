@@ -67,6 +67,7 @@ void cCmdInterp::cmdReadLoop()
 void cCmdInterp::verify(std::string firstKey) // verify keys
 {
 	//std::ifstream pubFile;
+	system(std::string("mv " + firstKey + " " + mOutDir + firstKey).c_str());
 	std::string instance;
 	std::string fileName = instance;
 	bool good = true;
@@ -80,7 +81,7 @@ void cCmdInterp::verify(std::string firstKey) // verify keys
 	std::cout << "instance " << instance << std::endl;
 	
 	std::cout << "start loop" << std::endl; 
-	unsigned int lastGoodKey = 0;
+	unsigned int lastGoodKey = 1;
 	while (good)
 	{
 		std::ifstream pubFile;
@@ -95,7 +96,12 @@ void cCmdInterp::verify(std::string firstKey) // verify keys
 			
 		good = keyStorage.RSAVerifyFile(fileName, instance);
 		if (good)
+		{
 			lastGoodKey = keyNumber;
+			//std::cout << "mv cmd " << "mv " + fileName + " " + mOutDir + fileName << std::endl;
+			fileName.erase(fileName.end() - 4, fileName.end()); // rm ".sig"
+			system(std::string("mv " + fileName + " " + mOutDir + fileName).c_str());
+		}
 		keyNumber++;
 	}
 	
@@ -108,4 +114,5 @@ void cCmdInterp::setOutDir(std::string outDir)
 	system(std::string("mkdir " + mOutDir).c_str());
 	if (outDir.back() != '/')
 		mOutDir.push_back('/');
+	//std::cout << "out dir: " << mOutDir << std::endl;
 }
