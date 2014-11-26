@@ -55,13 +55,13 @@ bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string 
 	input >> line;
 	//parse data
 	input >> pubicKeyNumber;
-	std::cout << line << " " << pubicKeyNumber << std::endl;
+	//std::cout << line << " " << pubicKeyNumber << std::endl;
 	for (int i = 0; i < 4; ++i)	// 3 lines
 	{
 		input >> line;
-		std::cout << line << " ";
+		//std::cout << line << " ";
 		input >> line;
-		std::cout << line << " " << std::endl;
+		//std::cout << line << " " << std::endl;
 	}
 	
 	clearTextFileName = line;
@@ -81,7 +81,7 @@ bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string 
 	FileSource(sig2file.c_str(), true, new StringSink(signature)); 
 	
 	//std::cout << std::endl << "signature " << std::noskipws << signature << std::endl;
-	std::cout << std::endl << "pubicKeyNumber " << pubicKeyNumber << std::endl;
+	//std::cout << std::endl << "pubicKeyNumber " << pubicKeyNumber << std::endl;
 	
 	std::string pubFile;
 	pubFile = instance + "-key" + std::to_string(pubicKeyNumber) + ".pub";
@@ -107,7 +107,7 @@ bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string 
 		std::cout << "verify error " << err.what() << std::endl;
 		return false;
 	}
-	std::cout << "end of RsaVerifyFile" << std::endl;
+	//std::cout << "end of RsaVerifyFile" << std::endl;
 }
 
 void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::PublicKey& pPubKey, std::string fileName)
@@ -137,9 +137,9 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
 		mOutFile << s;
 	}
 	
-    mOutFile.close();   
+    mOutFile.close();
     
-    std::cout << "end of savePubFile" << std::endl;
+    //std::cout << "end of savePubFile" << std::endl;
 }
 
 CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(std::string pPubKey)
@@ -152,9 +152,9 @@ CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(std::string pPubKey)
 	for (int i = 0; i < 3; i++)
 	{
 		input >> line;
-		std::cout << line << " ";
+		//std::cout << line << " ";
 		input >> line;
-		std::cout << line << std::endl;
+		//std::cout << line << std::endl;
 	}
 	std::cout << "Load rsa data" << std::endl;
 	input >> line; // END

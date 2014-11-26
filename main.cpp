@@ -12,6 +12,10 @@ using namespace std;
 // usage
 // chainsign --daemon name_of_instance out_dir
 // chainsign --verify-chain 1st_pub_key --move out_dir
+// chainsign --verify sig_file
+
+// ./chainsign --daemon my_instance .
+// ./chainsign --verify-chain my_instance-key1.pub --move good_keys
 int main(int argc, char* argv[])
 {
 	std::cout << "start main" << std::endl;
@@ -28,10 +32,12 @@ int main(int argc, char* argv[])
 	{
 		cCmdInterp cmdInterp;
 		cmdInterp.setOutDir(std::string(argv[4]));
-		cmdInterp.verify(std::string(argv[2]));
+		unsigned int ret = cmdInterp.verify(std::string(argv[2]));
+		if (ret == -1)
+			return 2; // keys verification error
 	}
 	
-    std::cout << KEY_SIZE << std::endl;
+    //std::cout << KEY_SIZE << std::endl;
 	/*cKeysStorage keyStorage = cKeysStorage();
 	keyStorage.RSAVerifyFile("test.txt.sig", "my_instance");*/
     //for (int i = 0; i < 1; ++i)

@@ -15,10 +15,10 @@ void cCmdInterp::cmdReadLoop()
 	keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub"); // generate 1st key
 	while (1)
 	{
-		std::cout << "loop" << std::endl;
+		//std::cout << "loop" << std::endl;
 		inputFIFO.open("fifo");
 		std::getline(inputFIFO, line);
-		std::cout << "line " << line << std::endl;
+		//std::cout << "line " << line << std::endl;
 		inputFIFO.close();
 		if (line == "QUIT")
 			break;
@@ -41,6 +41,7 @@ void cCmdInterp::cmdReadLoop()
 		}
 		else if(line == "VERIFY-FILE")
 		{
+			bool ok;
 			std::cout << "VERIFY-FILE" << std::endl;
 			std::cout << std::endl;
 			inputFIFO.close();
@@ -62,16 +63,27 @@ void cCmdInterp::cmdReadLoop()
 			inFile >> key;
 			inFile.close();
 			if (key < verify(std::string(instance + "-key1.pub.sig")))
+			{
 				std::cout << "                                               Keys OK" << std::endl;
+				ok = true;
+			}
 			else
+			{
+				ok = false;
 				std::cout << "                                               Keys verification error" << std::endl;
-				
-			keyStorage.RSAVerifyFile(line, instance);
+			}
+			
+			bool fileOK = keyStorage.RSAVerifyFile(line, instance);
 			inputFIFO.close();
+			
+			std::cout << "keys " << ok << std::endl;
+			std::cout << "file " << fileOK << std::endl;
+			if (ok && fileOK)
+				std::cout << "File OK" << std::endl;
 		}
 			
 	}
-	std::cout << "loop end" << std::endl;
+	//std::cout << "loop end" << std::endl;
 }
 
 
@@ -113,11 +125,18 @@ unsigned int cCmdInterp::verify(std::string firstKey) // verify keys
 			fileName.erase(fileName.end() - 4, fileName.end()); // rm ".sig"
 			system(std::string("cp " + fileName + " " + mOutDir + fileName).c_str());
 		}
+		
 		keyNumber++;
 	}
 	
 	std::cout << "Last good key: " << lastGoodKey << std::endl;
-	return lastGoodKey;
+	if (lastGoodKey > 1)
+	{
+		std::cout << "OK" << std::endl;
+		return lastGoodKey;
+	}
+	else
+		return -1;
  }
 
 void cCmdInterp::setOutDir(std::string outDir)
