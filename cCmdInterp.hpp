@@ -11,7 +11,7 @@ public:
 	cCmdInterp() = default;
 	cCmdInterp(std::string pFifoName, std::string pInstance);
 	void cmdReadLoop();
-	void verify(std::string firstKey);
+	unsigned int verify(std::string firstKey);
 	void setOutDir(std::string outDir);
 private:
 	std::ifstream inputFIFO;

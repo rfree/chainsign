@@ -55,6 +55,17 @@ void cCmdInterp::cmdReadLoop()
 			}
 			std::cout << "line " << line << std::endl;
 			std::cout << "instance " << instance << std::endl;
+			std::string tmp;
+			unsigned int key; // file was signed this key
+			std::ifstream inFile(line);
+			inFile >> tmp;
+			inFile >> key;
+			inFile.close();
+			if (key < verify(std::string(instance + "-key1.pub.sig")))
+				std::cout << "                                               Keys OK" << std::endl;
+			else
+				std::cout << "                                               Keys verification error" << std::endl;
+				
 			keyStorage.RSAVerifyFile(line, instance);
 			inputFIFO.close();
 		}
@@ -64,10 +75,10 @@ void cCmdInterp::cmdReadLoop()
 }
 
 
-void cCmdInterp::verify(std::string firstKey) // verify keys
+unsigned int cCmdInterp::verify(std::string firstKey) // verify keys
 {
 	//std::ifstream pubFile;
-	system(std::string("mv " + firstKey + " " + mOutDir + firstKey).c_str());
+	system(std::string("cp " + firstKey + " " + mOutDir + firstKey).c_str());
 	std::string instance;
 	std::string fileName = instance;
 	bool good = true;
@@ -100,12 +111,13 @@ void cCmdInterp::verify(std::string firstKey) // verify keys
 			lastGoodKey = keyNumber;
 			//std::cout << "mv cmd " << "mv " + fileName + " " + mOutDir + fileName << std::endl;
 			fileName.erase(fileName.end() - 4, fileName.end()); // rm ".sig"
-			system(std::string("mv " + fileName + " " + mOutDir + fileName).c_str());
+			system(std::string("cp " + fileName + " " + mOutDir + fileName).c_str());
 		}
 		keyNumber++;
 	}
 	
 	std::cout << "Last good key: " << lastGoodKey << std::endl;
+	return lastGoodKey;
  }
 
 void cCmdInterp::setOutDir(std::string outDir)
