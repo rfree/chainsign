@@ -50,7 +50,7 @@ bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string 
 	std::string line;
 	std::string clearTextFileName;
 	int pubicKeyNumber;
-	// read public key
+	// read sig file
 	std::ifstream input(fileName);
 	input >> line;
 	//parse data
@@ -70,6 +70,7 @@ bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string 
 	
 	std::string sig2file = line;
 	
+	std::cout << std::endl;
 	std::cout << "clear file: " << clearTextFileName << std::endl;
 	std::cout << "sig2 file: " << sig2file << std::endl;
 	
