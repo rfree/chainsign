@@ -44,7 +44,7 @@ void cKeysStorage::GenerateRSAKey(unsigned int keyLength, std::string fileName)
 	std::cout << "end of GenerateRSAKey" << std::endl;
 }
 
-bool cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
+bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string &instance) // load .sig file
 {
 	using namespace CryptoPP;
 	std::string line;
@@ -59,9 +59,9 @@ bool cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
 	for (int i = 0; i < 4; ++i)	// 3 lines
 	{
 		input >> line;
-		std::cout << line;
+		std::cout << line << " ";
 		input >> line;
-		std::cout << line << std::endl;
+		std::cout << line << " " << std::endl;
 	}
 	
 	clearTextFileName = line;
@@ -81,8 +81,10 @@ bool cKeysStorage::RSAVerifyFile(const std::string& fileName) // load .sig file
 	
 	//std::cout << std::endl << "signature " << std::noskipws << signature << std::endl;
 	std::cout << std::endl << "pubicKeyNumber " << pubicKeyNumber << std::endl;
-		
-	CryptoPP::RSA::PublicKey currentPubKey = loadPubFile(pubicKeyNumber);
+	
+	std::string pubFile;
+	pubFile = instance + "-key" + std::to_string(pubicKeyNumber) + ".pub";
+	CryptoPP::RSA::PublicKey currentPubKey = loadPubFile(pubFile);
 	AutoSeededRandomPool rng;
 	std::cout << "pub key validate " << currentPubKey.Validate(rng, 1);
 	std::cout << std::endl << "start verify" << std::endl;
@@ -139,11 +141,10 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
     std::cout << "end of savePubFile" << std::endl;
 }
 
-CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(unsigned int numberOfKey)
+CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(std::string pPubKey)
 {
-	std::string fileName(std::to_string(numberOfKey));
+	std::string fileName(pPubKey);
 	//fileName += ".pub";
-	fileName += ".pub";
 	std::cout << "Public key file: " << fileName << std::endl;
 	std::string line;
 	std::ifstream input(fileName);
