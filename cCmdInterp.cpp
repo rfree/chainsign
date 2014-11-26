@@ -29,7 +29,6 @@ void cCmdInterp::cmdReadLoop()
 			std::string pubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub";
 			system(std::string("touch " + pubFileName).c_str());
 			std::cout << "pubFileName " << pubFileName << std::endl;
-			//inputFIFO.close();
 			inputFIFO.open("fifo");
 			std::getline(inputFIFO, line);
 			std::cout << "sign file " << line << std::endl;
@@ -51,7 +50,6 @@ void cCmdInterp::cmdReadLoop()
 			auto it = line.begin();
 			while (*it != '-')
 			{
-				std::cout << "line " << *it << std::endl;
 				instance.push_back(*it);
 				it++;
 			}
@@ -96,7 +94,8 @@ void cCmdInterp::verify(std::string firstKey) // verify keys
 		}
 			
 		good = keyStorage.RSAVerifyFile(fileName, instance);
-		lastGoodKey = keyNumber - 1;
+		if (good)
+			lastGoodKey = keyNumber;
 		keyNumber++;
 	}
 	
