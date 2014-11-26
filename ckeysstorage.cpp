@@ -241,6 +241,7 @@ void cKeysStorage::RemoveRSAKey()
 	mPrvKeys.erase(mPrvKeys.begin());
 }
 
+
 /*
 .pub format:
 id-instance inst20141120_1242

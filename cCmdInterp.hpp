@@ -12,10 +12,12 @@ public:
 	cCmdInterp(std::string pFifoName, std::string pInstance);
 	void cmdReadLoop();
 	void verify(std::string firstKey);
+	void setOutDir(std::string outDir);
 private:
 	std::ifstream inputFIFO;
 	cKeysStorage keyStorage;
 	std::string inst;
+	std::string mOutDir;
 };
 
 #endif

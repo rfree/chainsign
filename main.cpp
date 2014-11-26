@@ -16,6 +16,7 @@ int main(int argc, char* argv[])
 	if (std::string(argv[1]) == "--daemon")
 	{
 		cCmdInterp cmdInterp("fifo", argv[2]);
+		cmdInterp.setOutDir(std::string(argv[3]));
 		std::cout << "start loop" << std::endl;
 		cmdInterp.cmdReadLoop();
 	}

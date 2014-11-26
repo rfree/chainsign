@@ -12,7 +12,7 @@ cCmdInterp::cCmdInterp(std::string pFifoName, std::string pInstance)
 void cCmdInterp::cmdReadLoop()
 {
 	std::string line;
-	keyStorage.GenerateRSAKey(KEY_SIZE, inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub"); // generate 1st key
+	keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub"); // generate 1st key
 	while (1)
 	{
 		std::cout << "loop" << std::endl;
@@ -32,12 +32,12 @@ void cCmdInterp::cmdReadLoop()
 			inputFIFO.open("fifo");
 			std::getline(inputFIFO, line);
 			std::cout << "sign file " << line << std::endl;
-			keyStorage.RSASignFile(line, inst + "-" + line + ".sig");
+			keyStorage.RSASignFile(line, mOutDir + inst + "-" + line + ".sig");
 			std::cout << "generate new key" << std::endl;
-			keyStorage.GenerateRSAKey(KEY_SIZE, pubFileName);
+			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
 			std::cout << "rm old key" << std::endl;
 			keyStorage.RemoveRSAKey();
-			keyStorage.RSASignFile(pubFileName, pubFileName + ".sig");	// sign key
+			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
 		}
 		else if(line == "VERIFY-FILE")
 		{
@@ -101,3 +101,11 @@ void cCmdInterp::verify(std::string firstKey) // verify keys
 	
 	std::cout << "Last good key: " << lastGoodKey << std::endl;
  }
+
+void cCmdInterp::setOutDir(std::string outDir)
+{
+	mOutDir = outDir;
+	system(std::string("mkdir " + mOutDir).c_str());
+	if (outDir.back() != '/')
+		mOutDir.push_back('/');
+}
