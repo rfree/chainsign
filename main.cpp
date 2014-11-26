@@ -9,6 +9,9 @@
 
 using namespace std;
 
+// usage
+// chainsign --daemon name_of_instance out_dir
+// chainsign --verify-chain 1st_pub_key --move out_dir
 int main(int argc, char* argv[])
 {
 	std::cout << "start main" << std::endl;
@@ -21,10 +24,11 @@ int main(int argc, char* argv[])
 		cmdInterp.cmdReadLoop();
 	}
 	
-	else if (std::string(argv[1]) == "--verify-chain" )//&& std::string(argv[3]) == "--move")
+	else if (std::string(argv[1]) == "--verify-chain" )
 	{
 		cCmdInterp cmdInterp;
 		cmdInterp.verify(std::string(argv[2]));
+		cmdInterp.setOutDir(std::string(argv[4]));
 	}
 	
     std::cout << KEY_SIZE << std::endl;
