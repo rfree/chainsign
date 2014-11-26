@@ -1,6 +1,8 @@
 #include "cCmdInterp.hpp"
 #include <iostream>
 
+#define KEY_SIZE 4096
+
 cCmdInterp::cCmdInterp(std::string pFifoName, std::string pInstance)
 :inst(pInstance)
 {
@@ -10,8 +12,7 @@ cCmdInterp::cCmdInterp(std::string pFifoName, std::string pInstance)
 void cCmdInterp::cmdReadLoop()
 {
 	std::string line;
-	keyStorage.GenerateRSAKey(4096, inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub"); // generate 1st key
-	//std::getline(inputFIFO, line);
+	keyStorage.GenerateRSAKey(KEY_SIZE, inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub"); // generate 1st key
 	while (1)
 	{
 		std::cout << "loop" << std::endl;
@@ -28,17 +29,36 @@ void cCmdInterp::cmdReadLoop()
 			std::string pubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub";
 			system(std::string("touch " + pubFileName).c_str());
 			std::cout << "pubFileName " << pubFileName << std::endl;
-			inputFIFO.close();
+			//inputFIFO.close();
 			inputFIFO.open("fifo");
 			std::getline(inputFIFO, line);
 			std::cout << "sign file " << line << std::endl;
-			keyStorage.RSASignFile(line, line + ".sig");
-			//keyStorage.RSASignFile(pubFileName, pubFileName + ".sig");	// sign key
+			keyStorage.RSASignFile(line, inst + "-" + line + ".sig");
 			std::cout << "generate new key" << std::endl;
-			keyStorage.GenerateRSAKey(4096, pubFileName);
+			keyStorage.GenerateRSAKey(KEY_SIZE, pubFileName);
 			std::cout << "rm old key" << std::endl;
 			keyStorage.RemoveRSAKey();
 			keyStorage.RSASignFile(pubFileName, pubFileName + ".sig");	// sign key
+		}
+		else if(line == "VERIFY-FILE")
+		{
+			std::cout << "VERIFY-FILE" << std::endl;
+			std::cout << std::endl;
+			inputFIFO.close();
+			inputFIFO.open("fifo");
+			std::getline(inputFIFO, line);
+			std::string instance;
+			auto it = line.begin();
+			while (*it != '-')
+			{
+				std::cout << "line " << *it << std::endl;
+				instance.push_back(*it);
+				it++;
+			}
+			std::cout << "line " << line << std::endl;
+			std::cout << "instance " << instance << std::endl;
+			keyStorage.RSAVerifyFile(line, instance);
+			inputFIFO.close();
 		}
 			
 	}
@@ -46,7 +66,7 @@ void cCmdInterp::cmdReadLoop()
 }
 
 
-void cCmdInterp::verify(std::string firstKey)
+void cCmdInterp::verify(std::string firstKey) // verify keys
 {
 	//std::ifstream pubFile;
 	std::string instance;
