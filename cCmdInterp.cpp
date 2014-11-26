@@ -137,7 +137,7 @@ unsigned int cCmdInterp::verify(std::string firstKey) // verify keys
 	}
 	else
 		return -1;
- }
+}
 
 void cCmdInterp::setOutDir(std::string outDir)
 {
@@ -146,4 +146,32 @@ void cCmdInterp::setOutDir(std::string outDir)
 	if (outDir.back() != '/')
 		mOutDir.push_back('/');
 	//std::cout << "out dir: " << mOutDir << std::endl;
+}
+
+unsigned int cCmdInterp::verifyOneFile(std::string fileName) //fileName = sig file
+{
+	std::string instance;
+	auto it = fileName.begin();
+	while (*it != '-')
+	{
+		instance.push_back(*it);
+		it++;
+	}
+	
+	std::string firstPubKey;
+	firstPubKey = instance + "-key1.pub";
+	
+	std::cout << "Start keys verification" << std::endl;
+	unsigned int ret = verify(std::string(fileName));
+	if (ret == -1)
+		return 2;
+	
+	std::cout << "file name " << fileName << std::endl;
+	ret = keyStorage.RSAVerifyFile(fileName, instance);
+	//std::cout << ret << std::endl;
+	if (ret == 0)
+		return 3;
+	
+	std::cout << "OK" << std::endl;	
+	return 0;
 }

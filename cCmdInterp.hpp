@@ -13,6 +13,7 @@ public:
 	void cmdReadLoop();
 	unsigned int verify(std::string firstKey);
 	void setOutDir(std::string outDir);
+	unsigned int verifyOneFile(std::string fileName);
 private:
 	std::ifstream inputFIFO;
 	cKeysStorage keyStorage;

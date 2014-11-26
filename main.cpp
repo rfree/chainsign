@@ -16,6 +16,7 @@ using namespace std;
 
 // ./chainsign --daemon my_instance .
 // ./chainsign --verify-chain my_instance-key1.pub --move good_keys
+// ./chainsign --verify-file sig_file
 int main(int argc, char* argv[])
 {
 	std::cout << "start main" << std::endl;
@@ -28,15 +29,21 @@ int main(int argc, char* argv[])
 		cmdInterp.cmdReadLoop();
 	}
 	
-	else if (std::string(argv[1]) == "--verify-chain" )
+	else if (std::string(argv[1]) == "--verify-chain")
 	{
 		cCmdInterp cmdInterp;
 		cmdInterp.setOutDir(std::string(argv[4]));
 		unsigned int ret = cmdInterp.verify(std::string(argv[2]));
 		if (ret == -1)
 			return 2; // keys verification error
+		std::cout << "OK" << std::endl;
 	}
 	
+	else if (std::string(argv[1]) == "--verify-file")
+	{
+		cCmdInterp cmdInterp;
+		return cmdInterp.verifyOneFile(std::string(argv[2]));
+	}
     //std::cout << KEY_SIZE << std::endl;
 	/*cKeysStorage keyStorage = cKeysStorage();
 	keyStorage.RSAVerifyFile("test.txt.sig", "my_instance");*/
@@ -50,3 +57,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+// return 0 - OK
+// return 1 - other error (exception)
+// return 2 - keys verification error
+// return 3 - file verification error
