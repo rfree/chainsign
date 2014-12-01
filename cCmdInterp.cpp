@@ -1,5 +1,7 @@
 #include "cCmdInterp.hpp"
 #include <iostream>
+#include <list>
+#include <sstream>
 #include <boost/filesystem.hpp>
 
 #define KEY_SIZE 4096
@@ -84,7 +86,40 @@ void cCmdInterp::cmdReadLoop()
 		}
 		else if(line == "SIGN-NEXTKEY-WAV-FILES")
 		{
-			
+			std::cout << "SIGN-NEXTKEY-WAV-FILES" << std::endl;
+			std::list<std::string> wavFiles;
+			boost::filesystem::directory_iterator dirIterator(".");
+			boost::filesystem::directory_iterator endIterator;
+			//generate new key
+			std::string pubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub";
+			system(std::string("touch " + pubFileName).c_str());
+			std::cout << "pubFileName " << pubFileName << std::endl;
+			while (dirIterator != endIterator)
+			{
+				if (boost::filesystem::is_regular_file(dirIterator->status()))
+				{
+					std::stringstream ss;
+					std::string fileName;
+					ss << *dirIterator;
+					ss >> fileName;
+					fileName.erase(fileName.begin(), fileName.begin() + 3);
+					fileName.pop_back();
+					if (fileName.find("wav") == (fileName.size() - 3))
+					{
+						wavFiles.push_back(fileName);
+						std::cout << fileName << std::endl;
+						// sign
+						keyStorage.RSASignFile(fileName, mOutDir + inst + "-" + fileName + ".sig");
+					}
+				}
+				
+				dirIterator++;
+			}
+			std::cout << "generate new key" << std::endl;
+			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
+			std::cout << "rm old key" << std::endl;
+			keyStorage.RemoveRSAKey();
+			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
 		}
 			
 	}
