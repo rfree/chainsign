@@ -102,6 +102,7 @@ void cCmdInterp::cmdReadLoop()
 					ss >> fileName;
 					fileName.erase(fileName.begin(), fileName.begin() + 3);
 					fileName.pop_back();
+					//if (fileName.find("txt") == (fileName.size() - 3)) // XXX wav
 					if (fileName.find("wav") == (fileName.size() - 3))
 					{
 						std::cout << fileName << std::endl;
@@ -117,8 +118,15 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "rm old key" << std::endl;
 			keyStorage.RemoveRSAKey();
 			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
-		}
 			
+			std::cout << "tar cf wav_files.tar " + inst + "*" << std::endl;
+			system(std::string("mv *.pub " + mOutDir).c_str());
+			system(std::string("mv *.sig2 " + mOutDir).c_str());
+			system(std::string("mv *.wav " + mOutDir).c_str());
+			//system(std::string("mv *.txt " + mOutDir).c_str());
+			system(std::string("tar czf " + inst + ".tar.gz " + mOutDir).c_str());
+			//system(std::string().c_str());
+		}
 	}
 	//std::cout << "loop end" << std::endl;
 }
