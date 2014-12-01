@@ -1,6 +1,5 @@
 #include "cCmdInterp.hpp"
 #include <iostream>
-#include <list>
 #include <sstream>
 #include <boost/filesystem.hpp>
 
@@ -87,7 +86,6 @@ void cCmdInterp::cmdReadLoop()
 		else if(line == "SIGN-NEXTKEY-WAV-FILES")
 		{
 			std::cout << "SIGN-NEXTKEY-WAV-FILES" << std::endl;
-			std::list<std::string> wavFiles;
 			boost::filesystem::directory_iterator dirIterator(".");
 			boost::filesystem::directory_iterator endIterator;
 			//generate new key
@@ -106,7 +104,6 @@ void cCmdInterp::cmdReadLoop()
 					fileName.pop_back();
 					if (fileName.find("wav") == (fileName.size() - 3))
 					{
-						wavFiles.push_back(fileName);
 						std::cout << fileName << std::endl;
 						// sign
 						keyStorage.RSASignFile(fileName, mOutDir + inst + "-" + fileName + ".sig");
