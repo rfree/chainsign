@@ -1,5 +1,6 @@
 #include "cCmdInterp.hpp"
 #include <iostream>
+#include <boost/filesystem.hpp>
 
 #define KEY_SIZE 4096
 
@@ -80,6 +81,10 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "file " << fileOK << std::endl;
 			if (ok && fileOK)
 				std::cout << "File OK" << std::endl;
+		}
+		else if(line == "SIGN-NEXTKEY-WAV-FILES")
+		{
+			
 		}
 			
 	}
