@@ -34,12 +34,23 @@ void cCmdInterp::cmdReadLoop()
 			inputFIFO.open("fifo");
 			std::getline(inputFIFO, line);
 			std::cout << "sign file " << line << std::endl;
-			keyStorage.RSASignFile(line, mOutDir + inst + "-" + line + ".sig");
+			system(std::string("cp " + line + " .").c_str());
+			auto it = line.end();
+			while (*it != '/')
+				it--;
+			line.erase(line.begin(), it + 1);
+			std::cout << "current file: " << line << std::endl;
+			std::cout << "out path" << mOutDir + inst + "-" + line + ".sig" << std::endl;
+			keyStorage.RSASignFile(line, "./" + mOutDir + inst + "-" + line + ".sig");
+			system(std::string("mv " + line + " " + mOutDir).c_str());
+			//std::cout << "mv cmd: " << "mv *.sig2 " + mOutDir << std::endl;
 			std::cout << "generate new key" << std::endl;
 			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
 			std::cout << "rm old key" << std::endl;
 			keyStorage.RemoveRSAKey();
 			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
+			system(std::string("mv *.sig2 " + mOutDir).c_str());
+			system("rm *.pub");
 		}
 		else if(line == "VERIFY-FILE")
 		{
