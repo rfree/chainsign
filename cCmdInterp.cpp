@@ -36,6 +36,7 @@ void cCmdInterp::cmdReadLoop()
 			if (!boost::filesystem::exists(line)) 
 			{
 				std::cout << "No found " << line << std::endl;
+				system("rm *.pub");
 				continue;
 			}
 			std::cout << "sign file " << line << std::endl;
@@ -57,7 +58,7 @@ void cCmdInterp::cmdReadLoop()
 			system(std::string("mv *.sig2 " + mOutDir).c_str());
 			system("rm *.pub");
 			
-			system(std::string("tar czf " + inst + ".tar.gz " + mOutDir).c_str());
+			//system(std::string("tar czf " + inst + ".tar.gz " + mOutDir).c_str());
 		}
 		else if(line == "VERIFY-FILE")
 		{
