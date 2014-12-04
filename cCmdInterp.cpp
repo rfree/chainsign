@@ -45,6 +45,10 @@ void cCmdInterp::cmdReadLoop()
 			while (*it != '/')
 				it--;
 			line.erase(line.begin(), it + 1);
+			std::string outDir = line;
+			outDir.erase(outDir.end() - 4, outDir.end());
+			std::cout << "outDir " << outDir << std::endl;
+			setOutDir(outDir);
 			std::cout << "current file: " << line << std::endl;
 			std::cout << "out path" << mOutDir + inst + "-" + line + ".sig" << std::endl;
 			keyStorage.RSASignFile(line, "./" + mOutDir + inst + "-" + line + ".sig");
