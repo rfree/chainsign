@@ -33,6 +33,11 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "pubFileName " << pubFileName << std::endl;
 			inputFIFO.open("fifo");
 			std::getline(inputFIFO, line);
+			if (!boost::filesystem::exists(line)) 
+			{
+				std::cout << "No found " << line << std::endl;
+				continue;
+			}
 			std::cout << "sign file " << line << std::endl;
 			system(std::string("cp " + line + " .").c_str());
 			auto it = line.end();
@@ -51,6 +56,8 @@ void cCmdInterp::cmdReadLoop()
 			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
 			system(std::string("mv *.sig2 " + mOutDir).c_str());
 			system("rm *.pub");
+			
+			system(std::string("tar czf " + inst + ".tar.gz " + mOutDir).c_str());
 		}
 		else if(line == "VERIFY-FILE")
 		{
