@@ -128,6 +128,7 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
 	pPubKey.DEREncode(pubkeysink);
 	pubkeysink.MessageEnd();
 	
+	std::cout << "Pub key:" << std::endl;
 	//append from tmp to pub file
 	std::ifstream tmpFile("tmp");
 	char s;
@@ -135,9 +136,11 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
 	{
 		tmpFile >> std::noskipws >> s;
 		mOutFile << s;
+		std::cout << s;
 	}
 	
     mOutFile.close();
+    std::cout << std::endl;
     
     //std::cout << "end of savePubFile" << std::endl;
 }
