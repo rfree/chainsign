@@ -62,7 +62,10 @@ void cCmdInterp::cmdReadLoop()
 			system(std::string("mv *.sig2 " + mOutDir).c_str());
 			system("rm *.pub");
 			
-			//system(std::string("tar czf " + inst + ".tar.gz " + mOutDir).c_str());
+			std::cout << "outDir " << outDir << std::endl;
+			std::cout << "create archive" << std::endl;
+			std::cout << std::string("tar zcvf " + outDir + ".tar.gz " + outDir) << std::endl;
+			system(std::string("tar zcvf " + outDir + ".tar.gz " + outDir).c_str());
 		}
 		else if(line == "VERIFY-FILE")
 		{
