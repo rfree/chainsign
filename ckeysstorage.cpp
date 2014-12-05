@@ -200,10 +200,11 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
     
     
 	//sign file
-	std::cout << std::endl << std::endl << "start sign file" << std::endl;
+	std::cout << std::endl << std::endl << "start sign file" << messageFilename << std::endl;
 	std::cout << "size of map " << mPrvKeys.size() << std::endl;
 	std::cout << "current key " << mCurrentKey << std::endl;
 	RSASSA_PKCS1v15_SHA_Signer privkey(mPrvKeys.at(mCurrentKey - 1));
+	std::cout << "sign file using key nr " << mCurrentKey - 1 << std::endl;
 	SecByteBlock sbbSignature(privkey.SignatureLength());
 	std::cout << "sign message" << std::endl;
 	privkey.SignMessage(
@@ -212,7 +213,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 		strContents.size(),
 		sbbSignature);
 	
-	std::cout << "Size of signature: " << sbbSignature.size() << std::endl;
+	//std::cout << "Size of signature: " << sbbSignature.size() << std::endl;
 	
 	//std::cout<<std::endl;
 	//std::cout.write( reinterpret_cast<const char*> (sbbSignature.BytePtr()) , sbbSignature.size() ); // XXX FIXME remove the bad cast!!! test

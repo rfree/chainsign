@@ -51,14 +51,18 @@ void cCmdInterp::cmdReadLoop()
 			setOutDir(outDir);
 			std::cout << "current file: " << line << std::endl;
 			std::cout << "out path" << mOutDir + inst + "-" + line + ".sig" << std::endl;
+			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			keyStorage.RSASignFile(line, "./" + mOutDir + inst + "-" + line + ".sig");
 			system(std::string("mv " + line + " " + mOutDir).c_str());
 			//std::cout << "mv cmd: " << "mv *.sig2 " + mOutDir << std::endl;
 			std::cout << "generate new key" << std::endl;
-			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
+			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
 			std::cout << "rm old key" << std::endl;
-			keyStorage.RemoveRSAKey();
+			//keyStorage.RemoveRSAKey();
 			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
+			
+			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
+			keyStorage.RemoveRSAKey(); // XXX
 			system(std::string("mv *.sig2 " + mOutDir).c_str());
 			system("rm *.pub");
 			
