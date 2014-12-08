@@ -5,6 +5,11 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <fstream>
+#include <sys/types.h>
+#include <signal.h>
+
+#include "sys/stat.h"
 
 #include <boost/program_options.hpp>
 #include "ckeysstorage.h"
@@ -32,7 +37,27 @@ void printHelp() {
 
 }
 
+bool isDaemonRunning() {
+
+
+	return true; // TODO
+}
+
+void clientCmd(const string &fifo, const string &cmd) {
+	fstream file;
+	cout << cmd << endl;
+	try {
+		file.open(fifo.c_str(), ios::app | ios::out);
+		file << cmd;
+		file.close();
+	} catch(fstream::failure &e) {
+		std::cerr << "Exception opening/reading/closing file\n";
+	}
+}
+
 int main(int argc, char* argv[]) {
+	const string fifo = "fifo";
+
 	try {
 		string opt;
 		namespace po = boost::program_options;
@@ -41,7 +66,8 @@ int main(int argc, char* argv[]) {
 		("help", "print help messages")
 		("daemon", "[name of instance] [outdir name] run as daemon mode")
 		("verify-chain", "[key.pub] [good_keys] verify keys and move them to good-key")
-		("verify-file", "[sig_file]");
+		("verify-file", "[sig_file]")
+		("client", "[command]");
 
 		po::variables_map vm;
 		po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -57,14 +83,18 @@ int main(int argc, char* argv[]) {
 
 			if (vm.count("daemon")) {
 				assert(argc == 4);
+//				if (isDaemonRunning()) return 1;
 
-				cCmdInterp cmdInterp("fifo", argv[2]);
+				auto fifoFile = mkfifo(fifo.c_str(), 0666);
+				if (fifoFile == -1) cout << "problem with creating fifo" << endl;
+
+				cCmdInterp cmdInterp(fifo, argv[2]);
 				cmdInterp.setOutDir(std::string(argv[3]));
 				std::cout << "start loop" << std::endl;
 				cmdInterp.cmdReadLoop();
 			}
 
-			else if (vm.count("verify-chain")) {
+			if (vm.count("verify-chain")) {
 				assert(argc == 5);
 
 				cCmdInterp cmdInterp;
@@ -74,10 +104,19 @@ int main(int argc, char* argv[]) {
 				std::cout << "OK" << std::endl;
 			}
 
-			else if (vm.count("verify-file")) {
+			if (vm.count("verify-file")) {
 				assert(argc == 3);
 				cCmdInterp cmdInterp;
 				return cmdInterp.verifyOneFile(std::string(argv[2]));
+			}
+
+			if (vm.count("client")) {
+				if (!isDaemonRunning()) return 1;
+				string cmd = argv[2]; cmd += "\n";
+				clientCmd(fifo,cmd);
+
+				return 0;
+
 			}
 
 			/*
