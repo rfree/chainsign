@@ -47,6 +47,9 @@ void cKeysStorage::GenerateRSAKey(unsigned int keyLength, std::string fileName)
 bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string &instance) // load .sig file
 {
 	using namespace CryptoPP;
+	std::cout << "Start RSAVerifyFile" << std::endl;
+	std::cout << "File name: " << fileName << std::endl;
+	std::cout << "instance: " << instance << std::endl;
 	std::string line;
 	std::string clearTextFileName;
 	int pubicKeyNumber;
@@ -85,6 +88,7 @@ bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string 
 	
 	std::string pubFile;
 	pubFile = instance + "-key" + std::to_string(pubicKeyNumber) + ".pub";
+	std::cout << "pub file: " << pubFile << std::endl;
 	CryptoPP::RSA::PublicKey currentPubKey = loadPubFile(pubFile);
 	AutoSeededRandomPool rng;
 	std::cout << "pub key validate " << currentPubKey.Validate(rng, 1);
@@ -116,21 +120,23 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
     std::string mOutName; //(std::to_string(numberOfKey));
     //mOutName += ".pub";
     mOutName = fileName;
-    mOutFile.open(mOutName);
+    std::cout << "Pub file: " << fileName << std::endl;
+    //mOutFile.open(mOutName);
     //save header
-    mOutFile << "version 1" << std::endl;
-    mOutFile << "crypto rsa" << std::endl;
-    mOutFile << "size 4096" << std::endl;
-    mOutFile << "END" << std::endl;
+    //mOutFile << "version 1" << std::endl;
+    //mOutFile << "crypto rsa" << std::endl;
+    //mOutFile << "size 4096" << std::endl;
+    //mOutFile << "END" << std::endl;
     
     //generate pub key in txt file
-    Base64Encoder pubkeysink(new FileSink("tmp"));
+    //Base64Encoder pubkeysink(new FileSink("tmp"));
+    Base64Encoder pubkeysink(new FileSink(mOutName.c_str()));
 	pPubKey.DEREncode(pubkeysink);
 	pubkeysink.MessageEnd();
 	
-	std::cout << "Pub key:" << std::endl;
+	//std::cout << "Pub key:" << std::endl;
 	//append from tmp to pub file
-	std::ifstream tmpFile("tmp");
+	/*std::ifstream tmpFile("tmp");
 	char s;
 	while (!tmpFile.eof())
 	{
@@ -140,9 +146,9 @@ void cKeysStorage::savePubFile(unsigned int numberOfKey, const CryptoPP::RSA::Pu
 	}
 	
     mOutFile.close();
-    std::cout << std::endl;
+    std::cout << std::endl;*/
     
-    //std::cout << "end of savePubFile" << std::endl;
+    std::cout << "end of savePubFile" << std::endl;
 }
 
 CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(std::string pPubKey)
@@ -150,7 +156,7 @@ CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(std::string pPubKey)
 	std::string fileName(pPubKey);
 	//fileName += ".pub";
 	std::cout << "Public key file: " << fileName << std::endl;
-	std::string line;
+	/*std::string line;
 	std::ifstream input(fileName);
 	for (int i = 0; i < 3; i++)
 	{
@@ -161,24 +167,25 @@ CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(std::string pPubKey)
 	}
 	std::cout << "Load rsa data" << std::endl;
 	input >> line; // END
-	
+	*/
 	// load rsa data
-	char byte;
+	//char byte;
 	
 	//from .pub to tmp
-	std::ofstream tmpFile("tmp", std::ios::trunc);
+	/*std::ofstream tmpFile("tmp", std::ios::trunc);
 	
 	while (!input.eof())
 	{
 		input >> std::noskipws >> byte;
+		std::cout << byte;
 		tmpFile << byte;
 	}
 	
-	tmpFile.close();
+	tmpFile.close();*/
 	
 	//Read public key
 	CryptoPP::ByteQueue bytes;
-	FileSource file("tmp", true, new Base64Decoder);
+	FileSource file(fileName.c_str(), true, new Base64Decoder);
 	file.TransferTo(bytes);
 	bytes.MessageEnd();
 	RSA::PublicKey pubKey;
@@ -200,7 +207,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
     
     
 	//sign file
-	std::cout << std::endl << std::endl << "start sign file" << messageFilename << std::endl;
+	std::cout << std::endl << std::endl << "start sign file " << messageFilename << std::endl;
 	std::cout << "size of map " << mPrvKeys.size() << std::endl;
 	std::cout << "current key " << mCurrentKey << std::endl;
 	RSASSA_PKCS1v15_SHA_Signer privkey(mPrvKeys.at(mCurrentKey - 1));

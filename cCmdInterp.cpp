@@ -94,7 +94,7 @@ void cCmdInterp::cmdReadLoop()
 			inFile >> tmp;
 			inFile >> key;
 			inFile.close();
-			if (key < verify(std::string(instance + "-key1.pub.sig")))
+			if (key < verify(std::string(instance + "-key1.pub"))) // XXX key1.pub.sig
 			{
 				std::cout << "                                               Keys OK" << std::endl;
 				ok = true;
@@ -165,7 +165,7 @@ void cCmdInterp::cmdReadLoop()
 unsigned int cCmdInterp::verify(std::string firstKey) // verify keys
 {
 	//std::ifstream pubFile;
-	system(std::string("cp " + firstKey + " " + mOutDir + firstKey).c_str());
+	system(std::string("cp " + firstKey + " " + mOutDir + firstKey).c_str()); // copy 1st key to out dir
 	std::string instance;
 	std::string fileName = instance;
 	bool good = true;
