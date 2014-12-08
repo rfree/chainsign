@@ -59,13 +59,15 @@ bool cKeysStorage::RSAVerifyFile(const std::string &fileName, const std::string 
 	//parse data
 	input >> pubicKeyNumber;
 	//std::cout << line << " " << pubicKeyNumber << std::endl;
+	std::cout << "====sig===" << std::endl;
 	for (int i = 0; i < 4; ++i)	// 3 lines
 	{
 		input >> line;
-		//std::cout << line << " ";
+		std::cout << line << " ";
 		input >> line;
-		//std::cout << line << " " << std::endl;
+		std::cout << line << " " << std::endl;
 	}
+	std::cout << "====sig===" << std::endl;
 	
 	clearTextFileName = line;
 	input >> line;

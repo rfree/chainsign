@@ -27,8 +27,10 @@ void cCmdInterp::cmdReadLoop()
 		else if(line == "SIGN-NEXTKEY")
 		{
 			std::cout << "SIGN-NEXTKEY" << std::endl;
+			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
 			std::cout << std::endl;
 			std::string pubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub";
+			std::string path;
 			system(std::string("touch " + pubFileName).c_str());
 			std::cout << "pubFileName " << pubFileName << std::endl;
 			inputFIFO.open("fifo");
@@ -44,6 +46,13 @@ void cCmdInterp::cmdReadLoop()
 			auto it = line.end();
 			while (*it != '/')
 				it--;
+			auto it2 = line.begin();
+			while (it2 != it + 1)
+			{
+				path += *it2;
+				it2++;
+			}
+			std::cout << "path: " << path << std::endl;
 			line.erase(line.begin(), it + 1);
 			std::string outDir = line;
 			outDir.erase(outDir.end() - 4, outDir.end());
@@ -52,24 +61,30 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "current file: " << line << std::endl;
 			std::cout << "out path" << mOutDir + inst + "-" + line + ".sig" << std::endl;
 			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
-			keyStorage.RSASignFile(line, "./" + mOutDir + inst + "-" + line + ".sig");
-			system(std::string("mv " + line + " " + mOutDir).c_str());
+			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
+			keyStorage.RSASignFile(line, "./" + path + inst + "-" + line + ".sig");
+			system(std::string("mv " + line + " " + path).c_str());
 			//std::cout << "mv cmd: " << "mv *.sig2 " + mOutDir << std::endl;
 			std::cout << "generate new key" << std::endl;
 			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
 			std::cout << "rm old key" << std::endl;
 			//keyStorage.RemoveRSAKey();
+			std::cout << "Sign last key" << std::endl;
+			std::cout << "Last key name: " << pubFileName << std::endl;
+			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
 			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
 			
 			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			keyStorage.RemoveRSAKey(); // XXX
-			system(std::string("mv *.sig2 " + mOutDir).c_str());
+			//system(std::string("mv *.sig2 " + mOutDir).c_str());
+			system(std::string("mv *.sig2 " + path).c_str());
+			system(std::string("mv *.sig " + path).c_str());
 			system("rm *.pub");
 			
 			std::cout << "outDir " << outDir << std::endl;
 			std::cout << "create archive" << std::endl;
-			std::cout << std::string("tar zcvf " + outDir + ".tar.gz " + outDir) << std::endl;
-			system(std::string("tar zcvf " + outDir + ".tar.gz " + outDir).c_str());
+			std::cout << std::string("tar zcvf " + path +  outDir + ".tar.gz " + outDir) << std::endl;
+			system(std::string("tar zcvf " + path + outDir + ".tar.gz " + outDir).c_str());
 		}
 		else if(line == "VERIFY-FILE")
 		{
@@ -162,10 +177,11 @@ void cCmdInterp::cmdReadLoop()
 }
 
 
-unsigned int cCmdInterp::verify(std::string firstKey) // verify keys
+unsigned int cCmdInterp::verify(std::string firstKey) // verify keys, get name of 1st pub file, return last good key
 {
+	std::cout << "start verify" << std::endl;
 	//std::ifstream pubFile;
-	system(std::string("cp " + firstKey + " " + mOutDir + firstKey).c_str()); // copy 1st key to out dir
+	//system(std::string("cp " + firstKey + " " + mOutDir + firstKey).c_str()); // copy 1st key to out dir
 	std::string instance;
 	std::string fileName = instance;
 	bool good = true;
@@ -175,8 +191,6 @@ unsigned int cCmdInterp::verify(std::string firstKey) // verify keys
 		instance += firstKey.front();
 		firstKey.erase(firstKey.begin());
 	}
-	
-	std::cout << "instance " << instance << std::endl;
 	
 	std::cout << "start loop" << std::endl; 
 	unsigned int lastGoodKey = 1;
@@ -191,7 +205,8 @@ unsigned int cCmdInterp::verify(std::string firstKey) // verify keys
 			std::cout << "No found " << fileName << std::endl;
 			break;
 		}
-			
+		
+		std::cout << "start verify " << fileName << std::endl;
 		good = keyStorage.RSAVerifyFile(fileName, instance);
 		if (good)
 		{
