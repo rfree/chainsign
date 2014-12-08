@@ -1,5 +1,6 @@
 chainsign
 *.pub
+*.sig
 tmp
 test.txt
 # Compiled Object files
