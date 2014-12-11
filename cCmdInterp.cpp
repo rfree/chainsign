@@ -69,13 +69,6 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
 			system(std::string("cp " + line + " .").c_str()); // cp file co current dir
 			
-			//keyStorage.RSASignFile(line, inst + "-" + line + ".sig", false);
-			// XXX keyStorage.RSASignFile(file, mOutDir + inst + "-" + file + ".sig", false);
-			//std::cout << "mv cmd: " << "mv *.sig2 " + mOutDir << std::endl;
-			//std::cout << "generate new key" << std::endl;
-			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
-			//std::cout << "rm old key" << std::endl;
-			//keyStorage.RemoveRSAKey();
 			std::cout << "Sign last key" << std::endl;
 			std::cout << "Last key name: " << pubFileName << std::endl;
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
