@@ -37,6 +37,7 @@ void cKeysStorage::GenerateRSAKey(unsigned int keyLength, std::string fileName)
 	//mPrvKeys.push_back(privateKey);
 	mPrvKeys[mCurrentKey] = privateKey;
 	std::cout << "start saving pub file" << std::endl;
+	std::cout << "generated file: " << fileName << std::endl;
 	savePubFile(mCurrentKey, publicKey, fileName);
 	
 	mCurrentKey++;
@@ -199,8 +200,10 @@ CryptoPP::RSA::PublicKey cKeysStorage::loadPubFile(std::string pPubKey)
 }
 
 //https://gist.github.com/TimSC/5251670
-void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::string& signatureFilename)
+void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::string& signatureFilename, bool signKey)
 {
+	if (signKey)
+		--mCurrentKey;
 	AutoSeededRandomPool rng;
 
     std::string strContents;
@@ -244,6 +247,9 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	
 	output.close();
 	
+	if (signKey)
+		++mCurrentKey;
+		
 	std::cout << "end of RSASignFile" << std::endl;
 }
 

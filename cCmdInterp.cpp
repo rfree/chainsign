@@ -30,6 +30,7 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
 			std::cout << std::endl;
 			std::string pubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub";
+			//std::string nextPubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey() + 1) + ".pub";
 			std::string path;
 			system(std::string("touch " + pubFileName).c_str());
 			std::cout << "pubFileName " << pubFileName << std::endl;
@@ -41,7 +42,9 @@ void cCmdInterp::cmdReadLoop()
 				system("rm *.pub");
 				continue;
 			}
+			
 			std::cout << "sign file " << line << std::endl;
+			std::cout << "cp " << line << " to ." << std::endl;
 			system(std::string("cp " + line + " .").c_str());
 			auto it = line.end();
 			while (*it != '/')
@@ -59,10 +62,11 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "outDir " << outDir << std::endl;
 			setOutDir(outDir);
 			std::cout << "current file: " << line << std::endl;
+			system(std::string("cp " + line + " " + outDir).c_str());
 			std::cout << "out path" << mOutDir + inst + "-" + line + ".sig" << std::endl;
 			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
-			keyStorage.RSASignFile(line, "./" + path + inst + "-" + line + ".sig");
+			keyStorage.RSASignFile(line, "./" + path + inst + "-" + line + ".sig", false);
 			system(std::string("mv " + line + " " + path).c_str());
 			//std::cout << "mv cmd: " << "mv *.sig2 " + mOutDir << std::endl;
 			std::cout << "generate new key" << std::endl;
@@ -72,9 +76,10 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "Sign last key" << std::endl;
 			std::cout << "Last key name: " << pubFileName << std::endl;
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
-			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
-			
 			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
+			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig", true);	// sign key
+			
+			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			keyStorage.RemoveRSAKey(); // XXX
 			//system(std::string("mv *.sig2 " + mOutDir).c_str());
 			system(std::string("mv *.sig2 " + path).c_str());
@@ -109,7 +114,8 @@ void cCmdInterp::cmdReadLoop()
 			inFile >> tmp;
 			inFile >> key;
 			inFile.close();
-			if (key < verify(std::string(instance + "-key1.pub"))) // XXX key1.pub.sig
+			if (key >= verify(std::string(instance + "-key1.pub"))) // XXX key1.pub.sig
+			//if (key < verify(std::string(instance + "-key1.pub"))) // XXX 
 			{
 				std::cout << "                                               Keys OK" << std::endl;
 				ok = true;
@@ -152,7 +158,7 @@ void cCmdInterp::cmdReadLoop()
 					{
 						std::cout << fileName << std::endl;
 						// sign
-						keyStorage.RSASignFile(fileName, mOutDir + inst + "-" + fileName + ".sig");
+						keyStorage.RSASignFile(fileName, mOutDir + inst + "-" + fileName + ".sig", false);
 					}
 				}
 				
@@ -162,7 +168,7 @@ void cCmdInterp::cmdReadLoop()
 			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
 			std::cout << "rm old key" << std::endl;
 			keyStorage.RemoveRSAKey();
-			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig");	// sign key
+			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig", true);	// sign key
 			
 			std::cout << "tar cf wav_files.tar " + inst + "*" << std::endl;
 			system(std::string("mv *.pub " + mOutDir).c_str());
