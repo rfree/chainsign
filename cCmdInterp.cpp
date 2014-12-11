@@ -31,8 +31,8 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << std::endl;
 			std::string pubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub";
 			//std::string nextPubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey() + 1) + ".pub";
-			std::string path;
-			system(std::string("touch " + pubFileName).c_str());
+			std::string path; // input dir
+			//system(std::string("touch " + pubFileName).c_str());
 			std::cout << "pubFileName " << pubFileName << std::endl;
 			inputFIFO.open("fifo");
 			std::getline(inputFIFO, line);
@@ -70,17 +70,18 @@ void cCmdInterp::cmdReadLoop()
 			system(std::string("cp " + line + " .").c_str()); // cp file co current dir
 			
 			//keyStorage.RSASignFile(line, inst + "-" + line + ".sig", false);
-			keyStorage.RSASignFile(file, mOutDir + inst + "-" + file + ".sig", false);
+			// XXX keyStorage.RSASignFile(file, mOutDir + inst + "-" + file + ".sig", false);
 			//std::cout << "mv cmd: " << "mv *.sig2 " + mOutDir << std::endl;
-			std::cout << "generate new key" << std::endl;
+			//std::cout << "generate new key" << std::endl;
 			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
-			std::cout << "rm old key" << std::endl;
+			//std::cout << "rm old key" << std::endl;
 			//keyStorage.RemoveRSAKey();
 			std::cout << "Sign last key" << std::endl;
 			std::cout << "Last key name: " << pubFileName << std::endl;
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
 			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
-			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig", true);	// sign key
+			keyStorage.RSASignFile(file, mOutDir + inst + "-" + file + ".sig", false); // sign file
+			keyStorage.RSASignFile(mOutDir + pubFileName, mOutDir + pubFileName + ".sig", true);	// sign key
 			
 			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			keyStorage.RemoveRSAKey(); // XXX
@@ -258,10 +259,13 @@ unsigned int cCmdInterp::verifyOneFile(std::string fileName) //fileName = sig fi
 		it++;
 	}
 	
+	//std::cout << "RSAVerifyFile " << keyStorage.RSAVerifyFile(fileName, instance) << std::endl;
+	
 	std::string firstPubKey;
 	firstPubKey = instance + "-key1.pub";
 	
 	std::cout << "Start keys verification" << std::endl;
+	std::cout << "first pub key " << firstPubKey << std::endl;
 	unsigned int ret = verify(std::string(fileName));
 	if (ret == -1)
 		return 2;
