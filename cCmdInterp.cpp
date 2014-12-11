@@ -58,16 +58,19 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "path: " << path << std::endl;
 			line.erase(line.begin(), it + 1);
 			std::string outDir = line;
+			std::string file(line);
+			std::cout << "FILE: " << file << std::endl;
 			outDir.erase(outDir.end() - 4, outDir.end());
 			std::cout << "outDir " << outDir << std::endl;
 			setOutDir(outDir);
 			std::cout << "current file: " << line << std::endl;
-			system(std::string("cp " + line + " " + outDir).c_str());
+			system(std::string("cp " + line + " " + outDir).c_str()); // cp file to out dir(archive)
 			std::cout << "out path" << mOutDir + inst + "-" + line + ".sig" << std::endl;
-			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
-			keyStorage.RSASignFile(line, "./" + path + inst + "-" + line + ".sig", false);
-			system(std::string("mv " + line + " " + path).c_str());
+			system(std::string("cp " + line + " .").c_str()); // cp file co current dir
+			
+			//keyStorage.RSASignFile(line, inst + "-" + line + ".sig", false);
+			keyStorage.RSASignFile(file, mOutDir + inst + "-" + file + ".sig", false);
 			//std::cout << "mv cmd: " << "mv *.sig2 " + mOutDir << std::endl;
 			std::cout << "generate new key" << std::endl;
 			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName);
@@ -82,9 +85,10 @@ void cCmdInterp::cmdReadLoop()
 			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			keyStorage.RemoveRSAKey(); // XXX
 			//system(std::string("mv *.sig2 " + mOutDir).c_str());
-			system(std::string("mv *.sig2 " + path).c_str());
+			system(std::string("mv *.sig2 " + mOutDir).c_str());
 			system(std::string("mv *.sig " + path).c_str());
-			system("rm *.pub");
+			system(std::string("mv *.pub " + path).c_str());
+			//system("rm *.pub");
 			
 			std::cout << "outDir " << outDir << std::endl;
 			std::cout << "create archive" << std::endl;
