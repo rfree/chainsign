@@ -5,7 +5,7 @@
 #include <thread>
 #include <boost/filesystem.hpp>
 
-#define KEY_SIZE 4096
+#define KEY_SIZE 2048
 
 cCmdInterp::cCmdInterp(std::string pFifoName, std::string pInstance)
 :inst(pInstance)

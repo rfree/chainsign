@@ -239,7 +239,7 @@ void cKeysStorage::RSASignFile(const std::string& messageFilename, const std::st
 	output << "id-nr " << mCurrentKey - 1 << std::endl;
 	output << "key-ver 1" << std::endl;
 	output << "key-crypto rsa" << std::endl;
-	output << "key-size 4096" << std::endl;
+    output << "key-size 2048" << std::endl;
 	output << "cleartext-file "<< messageFilename << std::endl;
 	output << "sig2-file " << sig2File << std::endl;
 	output << "END" << std::endl;
