@@ -1,6 +1,8 @@
 #include "cCmdInterp.hpp"
 #include <iostream>
 #include <sstream>
+#include <chrono>
+#include <thread>
 #include <boost/filesystem.hpp>
 
 #define KEY_SIZE 4096
@@ -17,10 +19,10 @@ void cCmdInterp::cmdReadLoop()
 	keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub"); // generate 1st key
 	while (1)
 	{
-		//std::cout << "loop" << std::endl;
+        //std::cout << "loop" << std::endl;
 		inputFIFO.open("fifo");
 		std::getline(inputFIFO, line);
-		//std::cout << "line " << line << std::endl;
+        //std::cout << "line " << line << std::endl;
 		inputFIFO.close();
 		if (line == "QUIT")
 			break;
@@ -176,8 +178,9 @@ void cCmdInterp::cmdReadLoop()
 			system(std::string("tar czf " + inst + ".tar.gz " + mOutDir).c_str());
 			//system(std::string().c_str());
 		}
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
-	//std::cout << "loop end" << std::endl;
+    //std::cout << "loop end" << std::endl;
 }
 
 
