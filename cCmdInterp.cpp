@@ -32,7 +32,7 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
 			std::cout << std::endl;
 			std::string pubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub";
-			//keyStorage.GenerateRSAKey(KEY_SIZE, pubFileName); // XXX
+			keyStorage.GenerateRSAKey(KEY_SIZE, pubFileName); // XXX
 			//std::string nextPubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey() + 1) + ".pub";
 			std::string path; // input dir
 			//system(std::string("touch " + pubFileName).c_str());
