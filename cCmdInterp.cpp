@@ -32,14 +32,19 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
 			std::cout << std::endl;
 			std::string pubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey()) + ".pub";
+			//keyStorage.GenerateRSAKey(KEY_SIZE, pubFileName); // XXX
 			//std::string nextPubFileName = inst + "-key" + std::to_string(keyStorage.getCurrentKey() + 1) + ".pub";
 			std::string path; // input dir
 			//system(std::string("touch " + pubFileName).c_str());
 			std::cout << "pubFileName " << pubFileName << std::endl;
 			inputFIFO.close();
-			inputFIFO.open("fifo");
-			std::getline(inputFIFO, line);
-			inputFIFO.close();
+			line.clear();
+			while (line.size() == 0)
+			{
+				inputFIFO.open("fifo");
+				std::getline(inputFIFO, line);
+				inputFIFO.close();
+			}
 			std::cout << "File to sign " << line << std::endl;
 			std::cout << "line size " << line.size() << std::endl;
 			if (!boost::filesystem::exists(line)) 
@@ -80,9 +85,12 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
 			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			keyStorage.RSASignFile(file, mOutDir + inst + "-" + file + ".sig", false); // sign file
-			keyStorage.RSASignFile(mOutDir + pubFileName, mOutDir + pubFileName + ".sig", true);	// sign key
+			//keyStorage.RSASignFile(mOutDir + pubFileName, mOutDir + pubFileName + ".sig", true);	// sign key
+			keyStorage.RSASignFile(pubFileName, mOutDir + pubFileName + ".sig", true);	// sign key XXX
 			
-			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
+			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
+			std::cout << "Generate pub key file: " << pubFileName << std::endl;
+			//keyStorage.GenerateRSAKey(KEY_SIZE, pubFileName); // XXX
 			keyStorage.RemoveRSAKey(); // XXX
 			//system(std::string("mv *.sig2 " + mOutDir).c_str());
 			system(std::string("cp *.sig2 " + mOutDir).c_str());
