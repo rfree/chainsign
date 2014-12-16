@@ -36,12 +36,16 @@ void cCmdInterp::cmdReadLoop()
 			std::string path; // input dir
 			//system(std::string("touch " + pubFileName).c_str());
 			std::cout << "pubFileName " << pubFileName << std::endl;
+			inputFIFO.close();
 			inputFIFO.open("fifo");
 			std::getline(inputFIFO, line);
+			inputFIFO.close();
+			std::cout << "File to sign " << line << std::endl;
+			std::cout << "line size " << line.size() << std::endl;
 			if (!boost::filesystem::exists(line)) 
 			{
-				std::cout << "No found " << line << std::endl;
-				system("rm *.pub");
+				std::cout << "No found file " << line << std::endl;
+				//system("rm *.pub");
 				continue;
 			}
 			
@@ -74,16 +78,16 @@ void cCmdInterp::cmdReadLoop()
 			std::cout << "Sign last key" << std::endl;
 			std::cout << "Last key name: " << pubFileName << std::endl;
 			std::cout << "current key: " << keyStorage.getCurrentKey() << std::endl;
-			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
+			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			keyStorage.RSASignFile(file, mOutDir + inst + "-" + file + ".sig", false); // sign file
 			keyStorage.RSASignFile(mOutDir + pubFileName, mOutDir + pubFileName + ".sig", true);	// sign key
 			
-			//keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
+			keyStorage.GenerateRSAKey(KEY_SIZE, mOutDir + pubFileName); // XXX
 			keyStorage.RemoveRSAKey(); // XXX
 			//system(std::string("mv *.sig2 " + mOutDir).c_str());
-			system(std::string("mv *.sig2 " + mOutDir).c_str());
-			system(std::string("mv *.sig " + path).c_str());
-			system(std::string("mv *.pub " + path).c_str());
+			system(std::string("cp *.sig2 " + mOutDir).c_str());
+			system(std::string("cp *.sig " + path).c_str());
+			system(std::string("cp *.pub " + path).c_str());
 			//system("rm *.pub");
 			
 			std::cout << "outDir " << outDir << std::endl;
@@ -238,6 +242,7 @@ unsigned int cCmdInterp::verify(std::string firstKey) // verify keys, get name o
 
 void cCmdInterp::setOutDir(std::string outDir)
 {
+	std::cout << "setOutDir()" << std::endl;
 	mOutDir = outDir;
 	system(std::string("mkdir " + mOutDir).c_str());
 	if (outDir.back() != '/')
